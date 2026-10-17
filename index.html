@@ -1,0 +1,1243 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>高数陪练 · 陕西专升本</title>
+<style>
+:root{
+  --bg:#0f1115;--card:#171a21;--card2:#1d222b;--line:#262c37;
+  --txt:#e9ecf1;--dim:#98a2b3;--brand:#4c8dff;--ok:#3fbf7f;--warn:#e0a33c;--err:#e46a6a;
+}
+@media (prefers-color-scheme: light){
+  :root{--bg:#f5f6f8;--card:#ffffff;--card2:#f0f2f5;--line:#e3e6eb;--txt:#191c22;--dim:#646c7a;
+  --brand:#2b6cf6;--ok:#159a5c;--warn:#a9761c;--err:#cc4242}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+  font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+body{padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+.hdr{position:sticky;top:0;z-index:20;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;
+  background:var(--bg);border-bottom:1px solid var(--line)}
+.hdr-row{display:flex;align-items:center;gap:8px}
+.logo{width:26px;height:26px;border-radius:8px;background:var(--brand);color:#fff;display:grid;place-items:center;
+  font-family:"Times New Roman",serif;font-size:18px;line-height:1;flex:none}
+.hdr-t{font-size:15px;font-weight:600}
+.hdr-d{margin-left:auto;font-size:12px;color:var(--dim)}
+.hdr-d b{color:var(--brand);font-size:15px;margin:0 2px}
+main{max-width:680px;margin:0 auto;padding:12px 14px 24px}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;
+  background:var(--bg);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tabs button{flex:1;appearance:none;border:0;background:none;color:var(--dim);font:inherit;font-size:11px;
+  padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabs button .ic{font-size:17px;line-height:1}
+.tabs button.on{color:var(--brand)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card h3{margin:0 0 10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card h3 .sp{margin-left:auto;font-size:12px;font-weight:400;color:var(--dim)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat .k{font-size:12px;color:var(--dim)}
+.stat .v{font-size:24px;font-weight:600;margin-top:2px}
+.stat .v i{font-size:12px;font-style:normal;font-weight:400;color:var(--dim);margin-left:3px}
+.bar{height:6px;border-radius:99px;background:var(--card2);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--brand);border-radius:99px}
+.row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.grow{flex:1;min-width:0}
+.clip{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dim{color:var(--dim)}
+.small{font-size:12px}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:0 8px;font-size:11px;
+  line-height:18px;color:var(--dim);white-space:nowrap;flex:none}
+.pill.hot{color:var(--err);border-color:var(--err)}
+.pill.ok{color:var(--ok);border-color:var(--ok)}
+.pill.warn{color:var(--warn);border-color:var(--warn)}
+.btn{appearance:none;font:inherit;font-size:13px;padding:7px 12px;border-radius:10px;border:1px solid var(--line);
+  background:var(--card2);color:var(--txt)}
+.btn.p{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.g{background:transparent}
+.btn.on{border-color:var(--brand);color:var(--brand)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;margin-bottom:10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips .btn{flex:none}
+.eq{font-family:"Cambria Math","Times New Roman",serif;font-size:15px;line-height:1.65;
+  background:var(--card2);border-radius:10px;padding:9px 11px;overflow-x:auto;white-space:nowrap}
+.q{font-family:"Cambria Math","Times New Roman",serif;font-size:15px;line-height:1.7;word-break:break-word}
+.sol{margin-top:8px;padding:9px 11px;border-left:2px solid var(--brand);background:var(--card2);
+  border-radius:0 10px 10px 0;font-size:13.5px;line-height:1.65}
+.acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.acts .btn{flex:1;min-width:76px}
+.chk{width:17px;height:17px;border-radius:50%;border:1px solid var(--line);flex:none;display:grid;place-items:center;
+  font-size:10px;color:transparent}
+.chk.on{background:var(--ok);border-color:var(--ok);color:#fff}
+input,textarea,select{font:inherit;color:inherit}
+.inp{width:100%;padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:var(--card2);font-size:14px}
+textarea.inp{min-height:56px;resize:vertical}
+.empty{padding:26px 16px;text-align:center;color:var(--dim);border:1px dashed var(--line);border-radius:14px}
+details.chap{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:10px;overflow:hidden}
+details.chap>summary{list-style:none;cursor:pointer;padding:13px 14px;display:flex;align-items:center;gap:9px}
+details.chap>summary::-webkit-details-marker{display:none}
+details.chap .bd{border-top:1px solid var(--line);padding:2px 14px 8px}
+.warnbar{background:var(--warn);color:#231a08;font-size:12px;padding:6px 14px;text-align:center}
+</style>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="陕西专升本高等数学：考点、公式、134 道题库、错题本、今日一练，离线可用。">
+</head>
+<body>
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="logo">∫</div>
+    <div>
+      <div class="hdr-t">高数陪练</div>
+      <div class="small dim">陕西专升本 · 150 分 / 150 分钟</div>
+    </div>
+    <div class="hdr-d">距考试 <b id="cd">—</b> 天</div>
+  </div>
+</header>
+<div id="notice"></div>
+<main id="view"></main>
+<nav class="tabs" id="tabs">
+  <button data-tab="overview" class="on"><span class="ic">◎</span>概览</button>
+  <button data-tab="syllabus"><span class="ic">☰</span>考点</button>
+  <button data-tab="formulas"><span class="ic">ƒ</span>公式</button>
+  <button data-tab="practice"><span class="ic">✎</span>刷题</button>
+  <button data-tab="wrong"><span class="ic">✗</span>错题</button>
+</nav>
+<script>
+const P = (id, name, freq, tip) => ({ id: id, name: name, freq: freq, tip: tip });
+
+    const CHAPTERS = [
+      {
+        id: 'ch1', title: '第一章 函数、极限与连续', weight: '约 22 分',
+        points: [
+          P('p1-1', '函数定义域与复合函数', 1, '先看分母≠0、偶次根号≥0、对数真数>0，再取交集。'),
+          P('p1-2', '七个未定式：0/0、∞/∞、∞−∞、0·∞、1^∞、0^0、∞^0', 3, '先判型再选法：等价无穷小、有理化、通分、取对数。你现在学的 ∞−∞ 就是这一节。'),
+          P('p1-3', '等价无穷小替换', 3, '乘除可以整体换，加减不要单独换（除非用泰勒确认主部）。'),
+          P('p1-4', '两个重要极限', 3, 'lim sinx/x=1；lim(1+1/x)^x=e。1^∞ 一律化成 e^{lim v(u−1)}。'),
+          P('p1-5', '洛必达法则', 3, '只有 0/0 或 ∞/∞ 才能用；用完检查是否化简、是否循环。'),
+          P('p1-6', '左右极限与分段点连续', 2, '分段点、|x|、e^{1/x} 都要分左右；左右极限相等才连续。'),
+          P('p1-7', '间断点分类', 2, '可去（极限存在）、跳跃（左右存在但不等）、无穷、振荡。'),
+          P('p1-8', '零点定理与介值定理', 2, '证明“至少有一个根”就构造函数并找两端异号。'),
+          P('p1-9', '数列极限与夹逼准则', 1, 'n 项和先放缩再夹逼，别硬算。'),
+        ],
+      },
+      {
+        id: 'ch2', title: '第二章 一元函数微分学', weight: '约 20 分',
+        points: [
+          P('p2-1', '导数定义与可导/连续关系', 3, '可导必连续，连续不一定可导（y=|x| 在 0 点）。'),
+          P('p2-2', '基本求导公式', 3, '每天默写一遍，重点是反三角与 sec/csc。'),
+          P('p2-3', '复合函数求导', 3, '由外向内一层层剥，别忘了乘内层导数。'),
+          P('p2-4', '隐函数求导', 3, '两边对 x 求导，把 y 看成 y(x)，最后解出 y′。'),
+          P('p2-5', '参数方程求导', 2, 'dy/dx = y′(t)/x′(t)；二阶导再除以 x′(t)。'),
+          P('p2-6', '对数求导法（幂指函数）', 2, 'y=x^x、y=(sinx)^x 一律先取对数。'),
+          P('p2-7', '高阶导数', 1, 'x^n、e^{ax}、sin ax 的 n 阶导有固定规律。'),
+          P('p2-8', '微分与近似计算', 1, 'dy=f′(x)dx；f(x0+Δx)≈f(x0)+f′(x0)Δx。'),
+          P('p2-9', '切线、法线方程', 2, '点斜式 y−y0=f′(x0)(x−x0)，法线斜率 −1/f′(x0)。'),
+        ],
+      },
+      {
+        id: 'ch3', title: '第三章 微分中值定理与导数应用', weight: '约 18 分',
+        points: [
+          P('p3-1', '罗尔、拉格朗日、柯西中值定理', 3, '看到 f(b)−f(a) 想拉格朗日；看到两个函数之比想柯西。'),
+          P('p3-2', '单调性与极值', 3, '先求 f′ 的零点和不可导点，再列表看符号变化。'),
+          P('p3-3', '凹凸性与拐点', 2, 'f″>0 凹（向上），f″ 变号处才是拐点。'),
+          P('p3-4', '闭区间最值', 2, '比较驻点值和两个端点值，别漏端点。'),
+          P('p3-5', '渐近线', 3, '垂直看分母零点，水平看 x→∞，斜的用 k=lim f/x、b=lim(f−kx)。'),
+          P('p3-6', '方程根的个数', 2, '单调性 + 端点（或极限）符号，一段最多一根。'),
+          P('p3-7', '不等式证明', 2, '移项构造函数 f，用单调性或最值证明。'),
+        ],
+      },
+      {
+        id: 'ch4', title: '第四章 不定积分', weight: '约 15 分',
+        points: [
+          P('p4-1', '原函数与不定积分概念', 2, '连续函数一定有原函数；结果别忘 +C。'),
+          P('p4-2', '基本积分表', 3, '背到条件反射：∫dx/x、∫sec²x、∫dx/(a²+x²)。'),
+          P('p4-3', '第一类换元（凑微分）', 3, '看到 f(g(x))g′(x) 就把 g′(x)dx 凑成 dg(x)。'),
+          P('p4-4', '第二类换元（三角代换）', 3, '√(a²−x²) 用 x=a sin t，√(a²+x²) 用 x=a tan t，√(x²−a²) 用 x=a sec t。'),
+          P('p4-5', '分部积分', 3, '∫u dv=uv−∫v du；选 u 的顺序：反、对、幂、三、指。'),
+          P('p4-6', '有理函数积分', 2, '假分式先做除法，真分式拆部分分式。'),
+          P('p4-7', '三角有理式积分', 1, '万能代换 t=tan(x/2) 是最后手段。'),
+        ],
+      },
+      {
+        id: 'ch5', title: '第五章 定积分及其应用', weight: '约 18 分',
+        points: [
+          P('p5-1', '定积分定义与性质', 2, '线性、区间可加、估值与比较大小。'),
+          P('p5-2', '奇偶性与对称性', 3, '对称区间上奇函数积分为 0，偶函数翻倍，能省一半时间。'),
+          P('p5-3', '变上限积分求导', 3, 'F′(x)=f(φ(x))φ′(x)；上限是 x² 时别忘乘 2x。'),
+          P('p5-4', '牛顿-莱布尼茨公式', 3, '先找原函数再代上下限，注意被积函数在区间内是否连续。'),
+          P('p5-5', '定积分换元与分部', 2, '换元必换限，换限后不用回代。'),
+          P('p5-6', '反常积分', 3, '先算定积分再取极限；两端都反常要拆开分别判。'),
+          P('p5-7', '面积与旋转体体积', 3, '面积 ∫|f−g|dx；绕 x 轴 V=π∫f²dx。'),
+          P('p5-8', '定积分证明题', 2, '常用积分中值定理、变上限函数构造、柯西不等式。'),
+        ],
+      },
+      {
+        id: 'ch6', title: '第六章 向量代数与空间解析几何', weight: '约 10 分',
+        points: [
+          P('p6-1', '向量的点积与叉积', 3, 'a·b=0 垂直，a×b=0 平行；叉积方向用右手定则。'),
+          P('p6-2', '平面方程', 3, '点法式 A(x−x0)+B(y−y0)+C(z−z0)=0。'),
+          P('p6-3', '直线方程', 3, '对称式 (x−x0)/m=(y−y0)/n=(z−z0)/p，方向向量 (m,n,p)。'),
+          P('p6-4', '夹角、距离与位置关系', 2, '线面夹角用 sin，面面夹角用 cos，点到平面用距离公式。'),
+          P('p6-5', '曲面与空间曲线', 1, '球面、柱面、旋转抛物面认方程即可。'),
+        ],
+      },
+      {
+        id: 'ch7', title: '第七章 多元函数微分学', weight: '约 15 分',
+        points: [
+          P('p7-1', '二元函数定义域与极限', 1, '开区域、闭区域、边界，了解即可。'),
+          P('p7-2', '偏导数与全微分', 3, '对 x 求偏导时把 y 当常数；可微 ⇒ 偏导存在，反之不成立。'),
+          P('p7-3', '复合函数链式法则', 3, '画变量关系树，一条路径乘一次，多条路径相加。'),
+          P('p7-4', '隐函数求导', 3, 'F(x,y,z)=0 时 z_x=−F_x/F_z，注意负号。'),
+          P('p7-5', '无条件极值', 3, '先解 z_x=z_y=0，再用 AC−B² 判别。'),
+          P('p7-6', '条件极值（拉格朗日乘数法）', 2, '构造 L=f+λg，解方程组，比较各点函数值。'),
+          P('p7-7', '几何应用（切平面、法线）', 1, 'F_x,F_y,F_z 就是法向量。'),
+        ],
+      },
+      {
+        id: 'ch8', title: '第八章 二重积分', weight: '约 12 分',
+        points: [
+          P('p8-1', '二重积分概念与性质', 1, '几何意义是曲顶柱体体积；可加性、比较定理。'),
+          P('p8-2', '直角坐标计算', 3, '先画区域，再定 X 型或 Y 型：内层上下限是函数，外层是常数。'),
+          P('p8-3', '交换积分次序', 3, '画图重新定限，这是最常考的小题。'),
+          P('p8-4', '极坐标计算', 3, '圆、扇形、环域一律极坐标：dσ=r dr dθ。'),
+          P('p8-5', '对称性与奇偶性', 3, '区域关于 y 轴对称时，被积函数对 x 为奇则积分为 0。'),
+          P('p8-6', '二重积分应用', 1, '求体积；被积函数取 1 时是面积。'),
+        ],
+      },
+      {
+        id: 'ch9', title: '第九章 无穷级数', weight: '约 10 分',
+        points: [
+          P('p9-1', '级数收敛与部分和', 2, '收敛 ⇔ 部分和数列有极限；收敛则通项趋于 0（反之不成立）。'),
+          P('p9-2', '几何级数与 p 级数', 3, '∑q^n 收敛 ⇔ |q|<1；∑1/n^p 收敛 ⇔ p>1。'),
+          P('p9-3', '正项级数审敛法', 3, '先看通项是否趋于 0，再用比较或比值审敛。'),
+          P('p9-4', '交错级数与莱布尼茨判别', 2, 'a_n 单调递减且趋于 0 即收敛。'),
+          P('p9-5', '绝对收敛与条件收敛', 3, '先判 |u_n|，绝对收敛最强；否则再看原级数。'),
+          P('p9-6', '幂级数收敛半径与收敛域', 3, 'R=lim|a_n/a_{n+1}|，端点必须单独验。'),
+          P('p9-7', '幂级数求和与函数展开', 3, 'e^x、sin x、cos x、ln(1+x)、1/(1−x) 五个必须背。'),
+        ],
+      },
+      {
+        id: 'ch10', title: '第十章 常微分方程', weight: '约 12 分',
+        points: [
+          P('p10-1', '基本概念：阶、通解、特解', 1, '阶数=最高阶导数；通解中任意常数个数=阶数。'),
+          P('p10-2', '可分离变量方程', 3, '把 y 和 x 分到两边再积分，别忘常数 C。'),
+          P('p10-3', '齐次方程', 2, '形如 y′=φ(y/x)，令 u=y/x，则 y′=u+xu′。'),
+          P('p10-4', '一阶线性方程', 3, '套公式 y=e^{−∫P}(∫Qe^{∫P}dx+C)，先化成标准形。'),
+          P('p10-5', '可降阶方程', 1, 'y″=f(x) 直接积两次；缺 y 令 p=y′，缺 x 令 p(y)。'),
+          P('p10-6', '二阶常系数齐次线性方程', 3, '特征方程三种根：两实根、重根、共轭复根。'),
+          P('p10-7', '二阶常系数非齐次', 2, '特解形式看右端：e^{λx}P(x)、三角型，用待定系数。'),
+        ],
+      },
+    ];
+
+    const F = (id, group, name, expr, note) => ({ id: id, group: group, name: name, expr: expr, note: note });
+
+    const FORMULAS = [
+      F('f1', '极限', '等价无穷小（x→0）', 'sin x ~ tan x ~ arcsin x ~ arctan x ~ ln(1+x) ~ e^x−1 ~ x', '乘除可整体替换，加减慎用'),
+      F('f2', '极限', '等价无穷小（x→0）', '1−cos x ~ x²/2；(1+x)^a−1 ~ ax；a^x−1 ~ x ln a', ''),
+      F('f3', '极限', '三阶等价无穷小（x→0）', 'x−sin x ~ x³/6；tan x−x ~ x³/3；x−ln(1+x) ~ x²/2', '加减抵消到低阶时用它'),
+      F('f4', '极限', '重要极限一', 'lim(x→0) sin x / x = 1', ''),
+      F('f5', '极限', '重要极限二', 'lim(x→∞) (1+1/x)^x = lim(x→0)(1+x)^{1/x} = e', ''),
+      F('f6', '极限', '1^∞ 型公式', 'lim u^v = e^{lim v·(u−1)}', 'u→1，v→∞'),
+      F('f7', '极限', '洛必达法则', 'lim f/g = lim f′/g′（0/0 或 ∞/∞）', '必须先验证型，且右端极限存在'),
+
+      F('f8', '导数', '幂函数', '(x^a)′ = a·x^{a−1}', ''),
+      F('f9', '导数', '指数函数', '(a^x)′ = a^x·ln a；(e^x)′ = e^x', ''),
+      F('f10', '导数', '对数函数', '(log_a x)′ = 1/(x·ln a)；(ln|x|)′ = 1/x', ''),
+      F('f11', '导数', '正弦余弦', '(sin x)′ = cos x；(cos x)′ = −sin x', ''),
+      F('f12', '导数', '正切余切', '(tan x)′ = sec²x；(cot x)′ = −csc²x', ''),
+      F('f13', '导数', '正割余割', '(sec x)′ = sec x·tan x；(csc x)′ = −csc x·cot x', ''),
+      F('f14', '导数', '反三角', '(arcsin x)′ = 1/√(1−x²)；(arccos x)′ = −1/√(1−x²)', ''),
+      F('f15', '导数', '反三角', '(arctan x)′ = 1/(1+x²)；(arccot x)′ = −1/(1+x²)', ''),
+      F('f16', '导数', '乘积与商', '(uv)′ = u′v + uv′；(u/v)′ = (u′v − uv′)/v²', ''),
+      F('f17', '导数', '复合函数', 'y=f(u)，u=g(x) ⇒ dy/dx = f′(u)·g′(x)', '由外向内逐层乘'),
+      F('f18', '导数', '隐函数', 'F(x,y)=0 ⇒ y′ = −F_x / F_y', '负号最容易丢'),
+      F('f19', '导数', '参数方程', 'dy/dx = y′(t)/x′(t)；d²y/dx² = (y″x′ − y′x″)/(x′)³', ''),
+      F('f20', '导数', '对数求导法', 'y = u^v ⇒ (ln y)′ = v′·ln u + v·u′/u', '幂指函数专用'),
+      F('f21', '导数', '微分与近似', 'dy = f′(x)dx；f(x0+Δx) ≈ f(x0) + f′(x0)Δx', ''),
+      F('f22', '导数', '切线、法线', '切线 y−y0 = f′(x0)(x−x0)；法线斜率 −1/f′(x0)', ''),
+
+      F('f23', '积分', '幂函数', '∫x^a dx = x^{a+1}/(a+1) + C（a≠−1）；∫dx/x = ln|x| + C', ''),
+      F('f24', '积分', '指数函数', '∫e^x dx = e^x + C；∫a^x dx = a^x/ln a + C', ''),
+      F('f25', '积分', '正弦余弦', '∫sin x dx = −cos x + C；∫cos x dx = sin x + C', ''),
+      F('f26', '积分', '平方割', '∫sec²x dx = tan x + C；∫csc²x dx = −cot x + C', ''),
+      F('f27', '积分', '割乘切', '∫sec x·tan x dx = sec x + C；∫csc x·cot x dx = −csc x + C', ''),
+      F('f28', '积分', '反三角型', '∫dx/(1+x²) = arctan x + C；∫dx/√(1−x²) = arcsin x + C', ''),
+      F('f29', '积分', '切与余切', '∫tan x dx = −ln|cos x| + C；∫cot x dx = ln|sin x| + C', ''),
+      F('f30', '积分', '割与余割', '∫sec x dx = ln|sec x + tan x| + C；∫csc x dx = ln|csc x − cot x| + C', ''),
+      F('f31', '积分', '含 a 的三个基本式', '∫dx/(a²+x²) = (1/a)arctan(x/a) + C', ''),
+      F('f32', '积分', '含 a 的三个基本式', '∫dx/√(a²−x²) = arcsin(x/a) + C', ''),
+      F('f33', '积分', '含 a 的三个基本式', '∫dx/(x²−a²) = (1/2a)·ln|(x−a)/(x+a)| + C', ''),
+      F('f34', '积分', '分部积分', '∫u dv = uv − ∫v du', '选 u 顺序：反、对、幂、三、指'),
+      F('f35', '积分', '变上限求导', 'd/dx ∫_a^{φ(x)} f(t)dt = f(φ(x))·φ′(x)', ''),
+      F('f36', '积分', '对称区间', '∫_{−a}^{a} f dx = 0（f 奇）；= 2∫_0^a f dx（f 偶）', ''),
+
+      F('f37', '中值定理与应用', '罗尔定理', 'f 在 [a,b] 连续、(a,b) 可导、f(a)=f(b) ⇒ ∃ξ，f′(ξ)=0', ''),
+      F('f38', '中值定理与应用', '拉格朗日中值定理', 'f(b) − f(a) = f′(ξ)(b − a)', ''),
+      F('f39', '中值定理与应用', '柯西中值定理', '[f(b)−f(a)]/[g(b)−g(a)] = f′(ξ)/g′(ξ)', ''),
+      F('f40', '中值定理与应用', '极值判别', 'f′(x0)=0；f″(x0)>0 极小，f″(x0)<0 极大', ''),
+      F('f41', '中值定理与应用', '渐近线', '垂直 x=a（lim f=∞）；水平 y=b；斜 y=kx+b，k=lim f/x，b=lim(f−kx)', '三类分别求'),
+      F('f42', '中值定理与应用', '凹凸与拐点', 'f″>0 凹（向上），f″<0 凸；f″ 变号处是拐点', ''),
+
+      F('f43', '多元与二重积分', '全微分', 'dz = z_x dx + z_y dy', ''),
+      F('f44', '多元与二重积分', '复合函数', 'z=z(x,y)，x=x(t)，y=y(t) ⇒ dz/dt = z_x·x′ + z_y·y′', ''),
+      F('f45', '多元与二重积分', '隐函数', 'F(x,y,z)=0 ⇒ z_x = −F_x/F_z，z_y = −F_y/F_z', ''),
+      F('f46', '多元与二重积分', '极值判别', 'z_x=z_y=0；AC−B²>0 时 A>0 极小、A<0 极大', 'A=z_xx，B=z_xy，C=z_yy'),
+      F('f47', '多元与二重积分', '极坐标', 'x=r cosθ，y=r sinθ，dσ = r dr dθ', '圆、扇形、环域必用'),
+      F('f48', '多元与二重积分', '对称性', 'D 关于 y 轴对称，f 对 x 为奇 ⇒ ∫∫f dσ = 0', ''),
+
+      F('f49', '级数', '几何级数', '∑_{n=0}^∞ q^n = 1/(1−q)（|q|<1）', ''),
+      F('f50', '级数', 'p 级数', '∑ 1/n^p：p>1 收敛，p≤1 发散', ''),
+      F('f51', '级数', '比值审敛', 'lim a_{n+1}/a_n = ρ：ρ<1 收敛，ρ>1 发散，ρ=1 失效', ''),
+      F('f52', '级数', '莱布尼茨判别', 'a_n 单调递减且 lim a_n=0 ⇒ ∑(−1)^{n−1}a_n 收敛', ''),
+      F('f53', '级数', '收敛半径', 'R = lim |a_n/a_{n+1}|', '端点单独验'),
+      F('f54', '级数', '常用展开', 'e^x = ∑x^n/n!；sin x = ∑(−1)^n x^{2n+1}/(2n+1)!；cos x = ∑(−1)^n x^{2n}/(2n)!', ''),
+      F('f55', '级数', '常用展开', 'ln(1+x) = ∑(−1)^{n−1}x^n/n（−1<x≤1）；1/(1−x) = ∑x^n（|x|<1）', ''),
+
+      F('f56', '微分方程', '可分离变量', 'dy/g(y) = f(x)dx，两边积分', ''),
+      F('f57', '微分方程', '齐次方程', 'y′=φ(y/x)，令 u=y/x ⇒ y′=u+xu′', ''),
+      F('f58', '微分方程', '一阶线性', 'y′ + P(x)y = Q(x) ⇒ y = e^{−∫P}(∫Qe^{∫P}dx + C)', '先化成标准形'),
+      F('f59', '微分方程', '二阶齐次特征根', 'r²+pr+q=0；两不等实根 y=C1e^{r1x}+C2e^{r2x}', ''),
+      F('f60', '微分方程', '二阶齐次特征根', '重根 y=(C1+C2x)e^{rx}', ''),
+      F('f61', '微分方程', '二阶齐次特征根', '共轭复根 α±βi：y=e^{αx}(C1cosβx + C2sinβx)', ''),
+    ];
+
+    const Q = (id, ch, level, type, q, hint, answer, sol) =>
+      ({ id: id, ch: ch, level: level, type: type, q: q, hint: hint, answer: answer, sol: sol });
+
+    const PROBLEMS = [
+      Q('q1-1', 'ch1', 'basic', 'fill', 'lim(x→0) sin3x / (2x) = ?',
+        'sin u ~ u，把 3x 看成一个整体。', '3/2',
+        'sin3x ~ 3x，所以原式 = 3x/(2x) = 3/2。'),
+      Q('q1-2', 'ch1', 'basic', 'calc', 'lim(x→∞) (√(x²+x) − x) = ?',
+        '∞−∞ 型：分子有理化，同乘 (√(x²+x)+x)。', '1/2',
+        '原式 = x/(√(x²+x)+x)，上下同除 x 得 1/(√(1+1/x)+1) → 1/2。'),
+      Q('q1-3', 'ch1', 'mid', 'calc', 'lim(x→0) [1/x − 1/(e^x−1)] = ?',
+        '先通分，再用 e^x−1−x ~ x²/2。', '1/2',
+        '原式 = (e^x−1−x)/[x(e^x−1)]；分子 ~ x²/2，分母 ~ x·x = x²，故极限 1/2。'),
+      Q('q1-4', 'ch1', 'basic', 'fill', 'lim(x→0) (1+2x)^{1/x} = ?',
+        '1^∞ 型，用 e^{lim v(u−1)}。', 'e²',
+        'e^{lim (1/x)·2x} = e²。'),
+      Q('q1-5', 'ch1', 'mid', 'choice', 'f(x) = (x²−1)/(x²−3x+2) 的间断点是（ ）',
+        '先把分母因式分解：(x−1)(x−2)。', 'x=1 为可去间断点，x=2 为无穷间断点',
+        'f(x)=(x+1)(x−1)/[(x−1)(x−2)]，x→1 时极限为 −2（可去）；x→2 时趋于 ∞（无穷）。'),
+      Q('q1-6', 'ch1', 'hard', 'proof', '证明方程 x³ − 4x² + 1 = 0 在 (0,1) 内至少有一个根。',
+        '零点定理：端点函数值异号 + 连续。', '见解析',
+        '令 f(x)=x³−4x²+1，在 [0,1] 上连续；f(0)=1>0，f(1)=−2<0，由零点定理存在 ξ∈(0,1) 使 f(ξ)=0。'),
+
+      Q('q2-1', 'ch2', 'mid', 'calc', 'y = x^x（x>0），求 y′。',
+        '幂指函数，先取对数。', 'y′ = x^x(ln x + 1)',
+        'ln y = x ln x，两边求导：y′/y = ln x + 1，故 y′ = x^x(ln x + 1)。'),
+      Q('q2-2', 'ch2', 'mid', 'calc', 'y = ln(x + √(1+x²))，求 y′。',
+        '直接链式求导，分母会约掉根号。', 'y′ = 1/√(1+x²)',
+        'y′ = [1 + x/√(1+x²)]/(x+√(1+x²)) = 1/√(1+x²)。'),
+      Q('q2-3', 'ch2', 'hard', 'calc', 'x = t²，y = t³，求 dy/dx 与 d²y/dx²。',
+        '先算 y′(t)/x′(t)，二阶导再除以 x′(t)。', 'dy/dx = 3t/2，d²y/dx² = 3/(4t)',
+        'dy/dx = 3t²/(2t) = 3t/2；d²y/dx² = (3/2)/(2t) = 3/(4t)。'),
+      Q('q2-4', 'ch2', 'mid', 'calc', 'xy + e^y = 1，求 y′。',
+        '两边对 x 求导，e^y 是复合函数。', 'y′ = −y/(x + e^y)',
+        'y + x y′ + e^y y′ = 0 ⇒ y′ = −y/(x+e^y)。'),
+      Q('q2-5', 'ch2', 'mid', 'choice', 'f(x) = x|x| 在 x=0 处（ ）',
+        '分左右写成分段函数再算导数定义。', '可导，且 f′(0)=0',
+        'x≥0 时 f=x²，x<0 时 f=−x²，左右导数都是 0，故可导；对比 y=|x| 在 0 点不可导。'),
+
+      Q('q3-1', 'ch3', 'mid', 'calc', '求 y = x³ − 3x² + 2 的极值。',
+        'y′=3x(x−2)，列表看符号。', '极大值 f(0)=2，极小值 f(2)=−2',
+        'y′=3x²−6x=3x(x−2)；x<0 增，0<x<2 减，x>2 增，故 x=0 极大、x=2 极小。'),
+      Q('q3-2', 'ch3', 'mid', 'calc', '求 y = x·e^{−x} 在 [0,3] 上的最大值和最小值。',
+        '先求驻点，再比端点。', '最大值 1/e（x=1），最小值 0（x=0）',
+        'y′=e^{−x}(1−x)，驻点 x=1；y(0)=0，y(1)=1/e，y(3)=3e^{−3}，比较得结论。'),
+      Q('q3-3', 'ch3', 'mid', 'calc', '求 y = (x²+1)/(x−1) 的渐近线。',
+        '先看分母零点，再用长除法看斜渐近线。', '垂直 x=1，斜渐近线 y=x+1',
+        'x→1 时 y→∞ 得 x=1；又 y = x+1+2/(x−1)，x→∞ 时 2/(x−1)→0，得 y=x+1。'),
+      Q('q3-4', 'ch3', 'hard', 'proof', '证明：当 x>0 时，x − x²/2 < ln(1+x) < x。',
+        '左右各构造一个函数，用导数判单调。', '见解析',
+        '令 f=ln(1+x)−x，f′=−x/(1+x)<0，f(0)=0 ⇒ ln(1+x)<x；令 g=ln(1+x)−x+x²/2，g′=x²/(1+x)>0，g(0)=0 ⇒ ln(1+x)>x−x²/2。'),
+      Q('q3-5', 'ch3', 'mid', 'calc', '求 y = x³ − 3x² 的凹凸区间与拐点。',
+        '二阶导 y″=6x−6。', '拐点 (1,−2)；x<1 凸，x>1 凹',
+        'y″=6(x−1)，x<1 时 y″<0（凸），x>1 时 y″>0（凹），x=1 处变号，y(1)=−2。'),
+
+      Q('q4-1', 'ch4', 'mid', 'calc', '∫ x·e^x dx = ?',
+        '分部积分，取 u=x，dv=e^x dx。', 'e^x(x − 1) + C',
+        '= x e^x − ∫e^x dx = e^x(x−1) + C。'),
+      Q('q4-2', 'ch4', 'mid', 'calc', '∫ dx/(x² + 2x + 5) = ?',
+        '配方成 (x+1)²+4。', '(1/2)arctan[(x+1)/2] + C',
+        '分母=(x+1)²+2²，套 ∫du/(u²+a²) 得 (1/2)arctan[(x+1)/2]+C。'),
+      Q('q4-3', 'ch4', 'mid', 'calc', '∫ sin²x dx = ?',
+        '降次：sin²x=(1−cos2x)/2。', 'x/2 − sin2x/4 + C',
+        '∫(1−cos2x)/2 dx = x/2 − sin2x/4 + C。'),
+      Q('q4-4', 'ch4', 'hard', 'calc', '∫ dx/[x(1+x²)] = ?',
+        '拆项：1/[x(1+x²)] = 1/x − x/(1+x²)。', 'ln|x| − (1/2)ln(1+x²) + C',
+        '分项积分：∫dx/x − ∫x/(1+x²)dx = ln|x| − (1/2)ln(1+x²) + C。'),
+
+      Q('q5-1', 'ch5', 'mid', 'calc', '∫_0^1 x·e^{−x} dx = ?',
+        '先分部求原函数，再代上下限。', '1 − 2/e',
+        '∫x e^{−x}dx = −(x+1)e^{−x}，代入 0→1 得 1 − 2/e。'),
+      Q('q5-2', 'ch5', 'mid', 'calc', 'F(x) = ∫_0^{x²} sin t dt，求 F′(x)。',
+        '上限是复合函数，别忘乘 2x。', 'F′(x) = 2x·sin(x²)',
+        '由变上限求导公式 F′(x)=sin(x²)·(x²)′ = 2x sin(x²)。'),
+      Q('q5-3', 'ch5', 'mid', 'calc', '∫_{−1}^{1} (x³cos x + x²) dx = ?',
+        '奇函数在对称区间积分为 0。', '2/3',
+        'x³cos x 是奇函数，积分为 0；∫_{−1}^{1}x²dx = 2/3。'),
+      Q('q5-4', 'ch5', 'basic', 'calc', '求曲线 y=x² 与 y=x 所围图形的面积。',
+        '交点 0 和 1，上减下。', '1/6',
+        '面积 = ∫_0^1 (x − x²)dx = 1/2 − 1/3 = 1/6。'),
+      Q('q5-5', 'ch5', 'mid', 'calc', 'y=√x（0≤x≤1）绕 x 轴旋转所得体积。',
+        'V=π∫y²dx。', 'π/2',
+        'V = π∫_0^1 x dx = π/2。'),
+      Q('q5-6', 'ch5', 'basic', 'calc', '∫_1^{+∞} dx/x² = ?',
+        '按定义先积到 b，再令 b→∞。', '1',
+        '= lim(b→∞)[−1/x]_1^b = 1 − lim 1/b = 1。'),
+
+      Q('q6-1', 'ch6', 'basic', 'calc', '求过点 (1,2,3)、法向量为 (2,−1,1) 的平面方程。',
+        '点法式直接写。', '2x − y + z − 3 = 0',
+        '2(x−1) − (y−2) + (z−3) = 0，整理得 2x−y+z−3=0。'),
+      Q('q6-2', 'ch6', 'basic', 'calc', 'a=(1,2,−1)，b=(2,0,1)，求 a·b 与 a×b。',
+        '叉积按行列式展开。', 'a·b = 1，a×b = (2,−3,−4)',
+        '点积 1·2+2·0+(−1)·1=1；叉积 (2·1−(−1)·0, (−1)·2−1·1, 1·0−2·2) = (2,−3,−4)。'),
+      Q('q6-3', 'ch6', 'mid', 'calc', '求平面 x+y+z=1 与 x−y+z=0 的夹角。',
+        '面面夹角用 cos，法向量分别是 (1,1,1) 与 (1,−1,1)。', 'arccos(1/√6)',
+        'cosθ = |1−1+1|/(√3·√2) = 1/√6。'),
+      Q('q6-4', 'ch6', 'mid', 'calc', '直线 (x−1)/2 = y/1 = (z+1)/3 与平面 x+y+z=3 的交点。',
+        '参数化代入平面方程解 t。', '(2, 1/2, 1/2)',
+        '令 t=(x−1)/2，得 x=1+2t, y=t, z=−1+3t；代入得 6t=3，t=1/2，代回得交点。'),
+
+      Q('q7-1', 'ch7', 'basic', 'calc', 'z = x²y + sin(xy)，求 z_x。',
+        '对 x 求偏导时 y 当常数。', 'z_x = 2xy + y·cos(xy)',
+        '两项分别对 x 求导，sin(xy) 是复合函数，内层对 x 导数是 y。'),
+      Q('q7-2', 'ch7', 'mid', 'calc', '由 x+y+z = e^z 确定 z=z(x,y)，求 z_x。',
+        '令 F=x+y+z−e^z，套 z_x=−F_x/F_z。', 'z_x = 1/(e^z − 1)',
+        'F_x=1，F_z=1−e^z，故 z_x = −1/(1−e^z) = 1/(e^z−1)。'),
+      Q('q7-3', 'ch7', 'basic', 'calc', '求 f(x,y)=x²+y²−2x−4y+5 的极值。',
+        '配方或解 f_x=f_y=0。', '极小值 f(1,2)=0',
+        'f_x=2x−2=0，f_y=2y−4=0 得 (1,2)；A=2>0，AC−B²=4>0，故为极小值 0。'),
+      Q('q7-4', 'ch7', 'mid', 'calc', '在 x+y=1 下，求 xy 的最大值。',
+        '消元或拉格朗日乘数法。', '1/4',
+        'y=1−x，xy=x(1−x)≤1/4，当 x=y=1/2 时取到。'),
+
+      Q('q8-1', 'ch8', 'basic', 'calc', '∫∫_D xy dσ，D: 0≤x≤1，0≤y≤2。',
+        '矩形区域可分离成两个一元积分相乘。', '1',
+        '∫_0^1 x dx · ∫_0^2 y dy = (1/2)·2 = 1。'),
+      Q('q8-2', 'ch8', 'mid', 'calc', '交换积分次序：∫_0^1 dx ∫_x^1 f(x,y) dy。',
+        '画出区域：0≤x≤1，x≤y≤1，即三角形。', '∫_0^1 dy ∫_0^y f(x,y) dx',
+        '区域是 y=x、y=1、x=0 围成的三角形，改写为 0≤y≤1，0≤x≤y。'),
+      Q('q8-3', 'ch8', 'mid', 'calc', '∫∫_D e^{x²+y²} dσ，D: x²+y²≤1。',
+        '圆域用极坐标，dσ=r dr dθ。', 'π(e−1)',
+        '原式 = ∫_0^{2π}dθ ∫_0^1 e^{r²} r dr = 2π·(e−1)/2 = π(e−1)。'),
+      Q('q8-4', 'ch8', 'hard', 'calc', '∫∫_D (x+y)² dσ，D: x²+y²≤1。',
+        '展开后交叉项 2xy 关于 y 轴为奇函数，积分为 0。', 'π/2',
+        '原式 = ∫∫(x²+y²)dσ = ∫_0^{2π}dθ ∫_0^1 r²·r dr = 2π·(1/4) = π/2。'),
+
+      Q('q9-1', 'ch9', 'basic', 'calc', '判断并求和：∑_{n=1}^∞ 1/[n(n+1)]。',
+        '裂项：1/[n(n+1)] = 1/n − 1/(n+1)。', '收敛，和为 1',
+        'S_n = 1 − 1/(n+1) → 1。'),
+      Q('q9-2', 'ch9', 'mid', 'calc', '求 ∑_{n=1}^∞ n/2^n 的和。',
+        '用 ∑nx^n = x/(1−x)²，取 x=1/2。', '2',
+        '∑n x^n = x/(1−x)²，x=1/2 时 = (1/2)/(1/4) = 2。'),
+      Q('q9-3', 'ch9', 'mid', 'calc', '求幂级数 ∑_{n=1}^∞ x^n/n 的收敛域。',
+        '先求 R，再单独验 x=±1。', '[−1, 1)',
+        'R=lim|a_n/a_{n+1}|=1；x=1 时调和级数发散，x=−1 时为交错级数收敛。'),
+      Q('q9-4', 'ch9', 'mid', 'choice', '∑_{n=1}^∞ (−1)^n/n 是（ ）',
+        '先看绝对值级数，再看原级数。', '条件收敛',
+        '∑1/n 发散，而交错级数满足莱布尼茨条件收敛，故为条件收敛。'),
+      Q('q9-5', 'ch9', 'mid', 'fill', '∑_{n=0}^∞ x^n/n! = ?',
+        '这是 e^x 的展开式。', 'e^x',
+        '直接背展开式：e^x = ∑x^n/n!，收敛域为 (−∞,+∞)。'),
+
+      Q('q10-1', 'ch10', 'basic', 'calc', '解 y′ = 2xy，y(0)=1。',
+        '可分离变量：dy/y = 2x dx。', 'y = e^{x²}',
+        'ln|y| = x² + C，由 y(0)=1 得 C=0，故 y=e^{x²}。'),
+      Q('q10-2', 'ch10', 'mid', 'calc', '解 y′ + y = e^x。',
+        '一阶线性，P=1，Q=e^x。', 'y = (1/2)e^x + C e^{−x}',
+        'y = e^{−x}(∫e^x·e^x dx + C) = e^{−x}(e^{2x}/2 + C) = (1/2)e^x + C e^{−x}。'),
+      Q('q10-3', 'ch10', 'basic', 'calc', '解 y″ − 3y′ + 2y = 0。',
+        '特征方程 r²−3r+2=0。', 'y = C1 e^x + C2 e^{2x}',
+        'r=1,2，两个不等实根，直接写通解。'),
+      Q('q10-4', 'ch10', 'mid', 'calc', '解 y″ − 2y′ + y = 0。',
+        '特征方程有重根。', 'y = (C1 + C2 x)e^x',
+        'r²−2r+1=(r−1)²=0，r=1 为二重根，通解为 (C1+C2x)e^x。'),
+      Q('q10-5', 'ch10', 'mid', 'calc', '解 xy′ + y = x（x>0）。',
+        '左边正是 (xy)′。', 'y = x/2 + C/x',
+        '(xy)′ = x ⇒ xy = x²/2 + C ⇒ y = x/2 + C/x。'),
+
+      Q('q1-7', 'ch1', 'basic', 'fill', 'lim(x→0) (1 − cos2x) / x² = ?',
+        '1 − cos u ~ u²/2，把 2x 看成整体。', '2',
+        '1−cos2x ~ (2x)²/2 = 2x²，故原式 = 2x²/x² = 2。'),
+      Q('q1-8', 'ch1', 'basic', 'calc', 'lim(x→0) tan3x / sin5x = ?',
+        'tan3x ~ 3x，sin5x ~ 5x。', '3/5',
+        '分子 ~ 3x，分母 ~ 5x，约掉 x 得 3/5。'),
+      Q('q1-9', 'ch1', 'mid', 'calc', 'lim(x→0) [√(1+x) − √(1−x)] / x = ?',
+        '分子有理化，或直接用 (1+x)^a ~ 1+ax。', '1',
+        '分子有理化：[(1+x)−(1−x)]/[x(√(1+x)+√(1−x))] = 2/(√+√) → 2/2 = 1。'),
+      Q('q1-10', 'ch1', 'mid', 'calc', 'lim(x→0) (e^x − 1 − x) / x² = ?',
+        'e^x 展开到二阶：e^x = 1 + x + x²/2 + o(x²)。', '1/2',
+        '分子 ≈ x²/2，故原式 = 1/2。等价无穷小说 e^x−1 ~ x 只到一阶，这里要二阶。'),
+      Q('q1-11', 'ch1', 'mid', 'fill', 'f(x) = sin2x / x（x≠0），f(0) = a。要使 f 在 x=0 连续，a = ?',
+        '连续要求 a = lim(x→0) f(x)。', '2',
+        'lim sin2x/x = 2，故 a = 2。'),
+      Q('q1-12', 'ch1', 'hard', 'calc', 'lim(x→0⁺) x·ln x = ?',
+        '0·∞ 型，先写成 ln x / (1/x) 再用洛必达。', '0',
+        '原式 = lim (ln x)/(1/x)，上下求导得 (1/x)/(−1/x²) = −x → 0。'),
+
+      Q('q1-13', 'ch1', 'basic', 'calc', 'lim(x→0) (1 − cos3x)/(x·sin x) = ?',
+        '1−cos3x ~ (3x)²/2，x·sin x ~ x²。', '9/2',
+        '分子 ~ 9x²/2，分母 ~ x²，故极限 9/2。'),
+      Q('q1-14', 'ch1', 'mid', 'calc', 'lim(x→0) (tan x − sin x)/x³ = ?',
+        '提 sin x：tan x − sin x = sin x·(1/cos x − 1) = sin x·(1−cos x)/cos x。', '1/2',
+        'sin x ~ x，1−cos x ~ x²/2，cos x→1，故整体 ~ x³/2。'),
+      Q('q1-15', 'ch1', 'basic', 'fill', 'lim(x→0) (1+x)^{1/x} = ?',
+        '第二个重要极限。', 'e',
+        '这是 e 的定义式，直接写 e。'),
+      Q('q1-16', 'ch1', 'basic', 'fill', 'lim(x→0) (a^x − 1)/x = ?（a>0）',
+        'a^x − 1 ~ x·ln a。', 'ln a',
+        '等价无穷小：a^x−1 ~ x ln a，故原式 = ln a。'),
+      Q('q1-17', 'ch1', 'basic', 'calc', 'lim(x→0) ln(1+3x)/x = ?',
+        'ln(1+u) ~ u。', '3',
+        'ln(1+3x) ~ 3x，故原式 = 3。'),
+      Q('q1-18', 'ch1', 'basic', 'calc', 'lim(x→0) (e^{2x} − 1)/sin x = ?',
+        '分子 e^u−1 ~ u，分母 sin x ~ x。', '2',
+        '分子 ~ 2x，分母 ~ x，故极限 2。'),
+      Q('q1-19', 'ch1', 'basic', 'calc', 'lim(x→0) (√(1+x) − 1)/x = ?',
+        '(1+x)^{1/2}−1 ~ x/2。', '1/2',
+        '等价无穷小或者有理化，结果都是 1/2。'),
+      Q('q1-20', 'ch1', 'basic', 'calc', 'lim(x→0) (1 − cos x)/(x·sin x) = ?',
+        '1−cos x ~ x²/2，sin x ~ x。', '1/2',
+        '分子 ~ x²/2，分母 ~ x²，得 1/2。'),
+      Q('q1-21', 'ch1', 'basic', 'fill', 'lim(x→0) [(1+x)^a − 1]/x = ?',
+        '(1+x)^a − 1 ~ ax。', 'a',
+        '套等价无穷小 (1+x)^a−1 ~ ax，故极限为 a。'),
+      Q('q1-22', 'ch1', 'basic', 'calc', 'lim(x→∞) [√(x²+3x) − x] = ?',
+        '∞−∞ 型，分子有理化。', '3/2',
+        '= 3x/[√(x²+3x)+x]，上下同除 x 得 3/(√(1+3/x)+1) → 3/2。'),
+      Q('q1-23', 'ch1', 'mid', 'calc', 'lim(x→∞) x[√(x²+1) − x] = ?',
+        '先把 x 乘进去，再有理化。', '1/2',
+        '= x/[√(x²+1)+x] = 1/(√(1+1/x²)+1) → 1/2。'),
+      Q('q1-24', 'ch1', 'mid', 'calc', 'lim(x→∞) [√(x²+x+1) − √(x²−x+1)] = ?',
+        '两式相减，分子有理化后分子是 2x。', '1',
+        '= (2x)/(√(x²+x+1)+√(x²−x+1))，上下同除 x 得 2/(1+1) = 1。'),
+      Q('q1-25', 'ch1', 'hard', 'calc', 'lim(x→0) [√(1+x) + √(1−x) − 2]/x² = ?',
+        '用展开式 (1+x)^{1/2} = 1 + x/2 − x²/8 + o(x²)。', '−1/4',
+        '两式相加：2 − x²/4 + o(x²)，减去 2 得 −x²/4，除以 x² 得 −1/4。'),
+      Q('q1-26', 'ch1', 'basic', 'fill', 'lim(x→0) (1+3x)^{1/x} = ?',
+        '1^∞ 型：e^{lim v(u−1)}。', 'e³',
+        'e^{lim (1/x)·3x} = e³。'),
+      Q('q1-27', 'ch1', 'mid', 'calc', 'lim(x→∞) (1 − 1/x)^x = ?',
+        '1^∞ 型，指数乘上 (u−1)。', 'e^{−1}',
+        'e^{lim x·(−1/x)} = e^{−1} = 1/e。'),
+      Q('q1-28', 'ch1', 'mid', 'calc', 'lim(x→∞) [x/(x+1)]^x = ?',
+        '先改写成 1/(1+1/x)^x。', 'e^{−1}',
+        '原式 = 1/(1+1/x)^x → 1/e。'),
+      Q('q1-29', 'ch1', 'hard', 'calc', 'lim(x→0) (cos x)^{1/x²} = ?',
+        '1^∞ 型，用 cos x − 1 ~ −x²/2。', 'e^{−1/2}',
+        'e^{lim (cos x − 1)/x²} = e^{−1/2} = 1/√e。'),
+      Q('q1-30', 'ch1', 'mid', 'calc', 'lim(x→0) (1 + tan x)^{1/x} = ?',
+        '1^∞ 型，tan x ~ x。', 'e',
+        'e^{lim tan x / x} = e¹ = e。'),
+      Q('q1-31', 'ch1', 'mid', 'calc', 'lim(x→0) (x − sin x)/x³ = ?',
+        '直接用三阶等价：x−sin x ~ x³/6。', '1/6',
+        '分子 ~ x³/6，故极限 1/6。'),
+      Q('q1-32', 'ch1', 'mid', 'calc', 'lim(x→0) (tan x − x)/x³ = ?',
+        'tan x 展开到三阶：tan x = x + x³/3 + o(x³)。', '1/3',
+        '分子 ~ x³/3，故极限 1/3。'),
+      Q('q1-33', 'ch1', 'hard', 'calc', 'lim(x→0) (e^x − e^{−x} − 2x)/x³ = ?',
+        '展开 e^x 与 e^{−x}，一阶项相减抵消。', '1/3',
+        'e^x−e^{−x} = 2x + x³/3 + o(x³)，减去 2x 得 x³/3。'),
+      Q('q1-34', 'ch1', 'basic', 'calc', 'lim(x→∞) (ln x)/x = ?',
+        '∞/∞ 型，洛必达。', '0',
+        '= lim (1/x)/1 = 0。对数增长比任何幂函数都慢。'),
+      Q('q1-35', 'ch1', 'basic', 'fill', 'f(x) = (e^x − 1)/x（x≠0），f(0) = a。使 f 在 0 连续，a = ?',
+        '连续要求 a 等于极限。', '1',
+        'lim(e^x−1)/x = 1，故 a = 1。'),
+      Q('q1-36', 'ch1', 'basic', 'choice', 'x = 2 是 f(x) = (x²−4)/(x−2) 的（ ）',
+        '先约分再看极限是否存在。', '可去间断点',
+        'f(x) = x+2（x≠2），lim(x→2) f = 4 存在，故为可去间断点。'),
+      Q('q1-37', 'ch1', 'basic', 'choice', 'x = 3 是 f(x) = 1/(x−3)² 的（ ）',
+        '看 x→3 时函数值的走向。', '无穷间断点',
+        'x→3 时 f→+∞，故为无穷间断点。'),
+      Q('q1-38', 'ch1', 'mid', 'choice', 'f(x) = x·sin(1/x)（x≠0），f(0)=0，则 f 在 x=0 处（ ）',
+        '用夹逼：|x sin(1/x)| ≤ |x|。', '连续（且极限为 0）',
+        '由夹逼定理 lim(x→0) x sin(1/x) = 0 = f(0)，故连续；但它不可导（差商振荡）。'),
+      Q('q1-39', 'ch1', 'mid', 'calc', '求 f(x) = (x+1)/(x²−1) 的间断点并分类。',
+        '先因式分解约分。', 'x = −1 为可去间断点，x = 1 为无穷间断点',
+        'f(x) = 1/(x−1)（x≠−1）；x→−1 时极限 −1/2（可去），x→1 时 →∞（无穷）。'),
+      Q('q1-40', 'ch1', 'hard', 'calc', 'f(x) = x²+1（x≤0），f(x) = ax+b（x>0）。要使 f 在 x=0 连续且可导，求 a、b。',
+        '先连续得 b，再用左右导数相等得 a。', 'a = 0，b = 1',
+        '连续：f(0)=1 ⇒ b=1；可导：左导数 (x²+1)′|₀=0，右导数 a，故 a=0。'),
+      Q('q1-41', 'ch1', 'hard', 'proof', '证明方程 x³ + x − 1 = 0 在 (0,1) 内有且仅有一个实根。',
+        '零点定理给存在，单调性给唯一。', '见解析',
+        'f(0)=−1<0，f(1)=1>0，连续 ⇒ 至少一根；又 f′=3x²+1>0 恒成立，f 严格递增 ⇒ 至多一根。'),
+      Q('q1-42', 'ch1', 'basic', 'fill', 'lim(n→∞) (1 + 1/n)^n = ?',
+        '数列形式的重要极限。', 'e',
+        '与 lim(x→∞)(1+1/x)^x 相同，等于 e。'),
+      Q('q1-43', 'ch1', 'hard', 'calc', 'lim(n→∞) [1/√(n²+1) + 1/√(n²+2) + … + 1/√(n²+n)] = ?',
+        'n 项和，用夹逼：每项介于 n/√(n²+n) 与 n/√(n²+1) 之间。', '1',
+        'n/√(n²+n) ≤ S_n ≤ n/√(n²+1)，两端极限都是 1，由夹逼得 1。'),
+      Q('q1-44', 'ch1', 'hard', 'calc', 'lim(n→∞) (2^n + 3^n)^{1/n} = ?',
+        '提最大底数 3^n：3·(1 + (2/3)^n)^{1/n}。', '3',
+        '原式 = 3·[(1+(2/3)^n)^{1/n}]，括号内 → 1，故极限 3。'),
+      Q('q1-45', 'ch1', 'basic', 'fill', '当 x→0 时，1 − cos x 是 x 的几阶无穷小？',
+        '1−cos x ~ x²/2。', '二阶',
+        '因为 (1−cos x)/x² → 1/2 ≠ 0，故与 x² 同阶，是二阶无穷小。'),
+      Q('q1-46', 'ch1', 'basic', 'choice', '当 x→0 时，下列与 x 等价的是（ ）',
+        '逐个看与 x 的比值是否趋于 1。', 'ln(1+x)',
+        'ln(1+x) ~ x；而 1−cos x ~ x²/2、x−sin x ~ x³/6、√x 与 x 不同阶。'),
+      Q('q1-47', 'ch1', 'mid', 'fill', '当 x→0 时，x − sin x 是 x 的几阶无穷小？',
+        'x − sin x ~ x³/6。', '三阶',
+        '因为 (x−sin x)/x³ → 1/6，故为三阶无穷小。'),
+      Q('q1-48', 'ch1', 'basic', 'calc', '求 f(x) = √(4−x²)/ln(x+1) 的定义域。',
+        '根号内≥0、对数真数>0、分母≠0，取交集。', '(−1, 0) ∪ (0, 2]',
+        '4−x²≥0 ⇒ −2≤x≤2；x+1>0 ⇒ x>−1；ln(x+1)≠0 ⇒ x≠0，取交集得 (−1,0)∪(0,2]。'),
+      Q('q1-49', 'ch1', 'mid', 'calc', 'f(x) = x/(1−x)，求 f[f(x)]。',
+        '把 f(x) 代回自变量位置。', 'x/(1−2x)',
+        'f[f(x)] = [x/(1−x)] / [1 − x/(1−x)] = [x/(1−x)] / [(1−2x)/(1−x)] = x/(1−2x)。'),
+      Q('q1-50', 'ch1', 'hard', 'calc', 'lim(x→0) (sin x − x·cos x)/x³ = ?',
+        '展开：sin x ≈ x − x³/6，cos x ≈ 1 − x²/2。', '1/3',
+        '分子 ≈ (x − x³/6) − x(1 − x²/2) = x³/3，故极限 1/3。'),
+
+      Q('q2-6', 'ch2', 'basic', 'calc', 'y = sin(x²)，求 y′。',
+        '外层 sin，内层 x²。', 'y′ = 2x·cos(x²)',
+        'y′ = cos(x²)·(x²)′ = 2x cos(x²)。'),
+      Q('q2-7', 'ch2', 'basic', 'calc', 'y = arctan(2x)，求 y′。',
+        '套 (arctan u)′ = u′/(1+u²)。', 'y′ = 2/(1 + 4x²)',
+        'y′ = (2x)′/[1+(2x)²] = 2/(1+4x²)。'),
+      Q('q2-8', 'ch2', 'mid', 'calc', 'x² + y² = 4 在点 (1, √3) 处的切线方程。',
+        '隐函数求导得 y′ = −x/y。', 'x + √3·y = 4',
+        'y′ = −x/y = −1/√3；切线 y−√3 = −(1/√3)(x−1)，整理得 x+√3y = 4。'),
+      Q('q2-9', 'ch2', 'mid', 'calc', 'x = e^t，y = t·e^t，求 dy/dx。',
+        'dy/dx = y′(t)/x′(t)。', 'dy/dx = 1 + t',
+        'y′ = e^t + t e^t = e^t(1+t)，x′ = e^t，相除得 1+t。'),
+      Q('q2-10', 'ch2', 'basic', 'calc', 'y = x² 在 x=1 处，Δx = 0.01，求 dy。',
+        'dy = f′(x)dx。', 'dy = 0.02',
+        'f′(x) = 2x，f′(1) = 2，dy = 2×0.01 = 0.02（实际 Δy = 0.0201）。'),
+
+      Q('q3-6', 'ch3', 'mid', 'calc', '求 y = x − ln(1+x) 的单调区间与极值。',
+        'y′ = x/(1+x)，注意定义域 x>−1。', '(−1,0) 递减，(0,+∞) 递增，极小值 y(0) = 0',
+        'y′ = 1 − 1/(1+x) = x/(1+x)；−1<x<0 时 y′<0，x>0 时 y′>0，故 x=0 取极小值 0。'),
+      Q('q3-7', 'ch3', 'mid', 'calc', '求 y = x³ − 3x 在 [−2, 2] 上的最大值与最小值。',
+        '驻点 x=±1，再比端点。', '最大值 2，最小值 −2',
+        'y′=3x²−3=0 得 x=±1；y(−2)=−2，y(−1)=2，y(1)=−2，y(2)=2，比较得结论。'),
+      Q('q3-8', 'ch3', 'basic', 'proof', '证明：当 x>0 时，e^x > 1 + x。',
+        '构造 f = e^x − 1 − x，看导数符号。', '见解析',
+        'f(0)=0，f′(x)=e^x−1>0（x>0），故 f 在 (0,+∞) 递增，f(x)>f(0)=0。'),
+      Q('q3-9', 'ch3', 'mid', 'calc', '求 y = x²/(x²−1) 的渐近线。',
+        '分母零点给垂直渐近线；x→∞ 看水平。', '垂直 x=1、x=−1，水平 y=1',
+        'x→±1 时 y→∞；x→∞ 时 y = 1 + 1/(x²−1) → 1，故水平渐近线 y=1。'),
+      Q('q3-10', 'ch3', 'hard', 'choice', '方程 x³ − 3x + 1 = 0 的实根个数是（ ）',
+        '求极值，看极值点两侧的符号。', '3 个',
+        'f′=3x²−3，极大 f(−1)=3>0，极小 f(1)=−1<0；三段各有一个根，共 3 个。'),
+
+      Q('q4-5', 'ch4', 'mid', 'calc', '∫ x·√(x²+1) dx = ?',
+        '凑微分：x dx = (1/2)d(x²+1)。', '(1/3)(x²+1)^{3/2} + C',
+        '令 u = x²+1，du = 2x dx，原式 = (1/2)∫u^{1/2}du = (1/3)u^{3/2}+C。'),
+      Q('q4-6', 'ch4', 'basic', 'calc', '∫ e^{2x} dx = ?',
+        '凑 d(2x)。', '(1/2)e^{2x} + C',
+        '∫e^{2x}dx = (1/2)∫e^{2x}d(2x) = (1/2)e^{2x}+C。'),
+      Q('q4-7', 'ch4', 'mid', 'calc', '∫ dx/(x² − 9) = ?',
+        '套 ∫dx/(x²−a²) 公式，a=3。', '(1/6)·ln|(x−3)/(x+3)| + C',
+        '直接用公式 ∫dx/(x²−a²) = (1/2a)ln|(x−a)/(x+a)|+C，a=3。'),
+      Q('q4-8', 'ch4', 'mid', 'calc', '∫ x·cos x dx = ?',
+        '分部：u=x，dv=cos x dx。', 'x·sin x + cos x + C',
+        '= x sin x − ∫sin x dx = x sin x + cos x + C。'),
+      Q('q4-9', 'ch4', 'mid', 'calc', '∫ ln x dx = ?',
+        '把 ln x 看成 ln x · 1，分部积分。', 'x·ln x − x + C',
+        'u=ln x，dv=dx ⇒ = x ln x − ∫x·(1/x)dx = x ln x − x + C。'),
+
+      Q('q5-7', 'ch5', 'basic', 'calc', '∫_0^π sin x dx = ?',
+        '原函数是 −cos x。', '2',
+        '= [−cos x]_0^π = −(−1) − (−1) = 2。'),
+      Q('q5-8', 'ch5', 'mid', 'calc', '∫_0^1 (2x+1)³ dx = ?',
+        '换元 u = 2x+1，或直接凑微分。', '10',
+        '= (1/2)·[(2x+1)^4/4]_0^1 = (1/8)(81−1) = 10。'),
+      Q('q5-9', 'ch5', 'mid', 'calc', '∫_0^2 |x − 1| dx = ?',
+        '在 x=1 处拆成两段，去掉绝对值。', '1',
+        '= ∫_0^1 (1−x)dx + ∫_1^2 (x−1)dx = 1/2 + 1/2 = 1。'),
+      Q('q5-10', 'ch5', 'mid', 'calc', 'F(x) = ∫_x^{x²} e^t dt，求 F′(x)。',
+        '上下限都是函数，拆成两项再求导。', 'F′(x) = 2x·e^{x²} − e^x',
+        'F = ∫_0^{x²} − ∫_0^x，求导得 e^{x²}·2x − e^x。'),
+      Q('q5-11', 'ch5', 'mid', 'calc', '求 y = ln x、x 轴、x = e 围成的图形面积。',
+        '积分区间 1 到 e，注意 ln x ≥ 0。', '1',
+        '面积 = ∫_1^e ln x dx = [x ln x − x]_1^e = (e−e) − (0−1) = 1。'),
+
+      Q('q6-5', 'ch6', 'mid', 'calc', '求过 A(1,0,0)、B(0,1,0)、C(0,0,1) 三点的平面方程。',
+        '用截距式 x/a + y/b + z/c = 1。', 'x + y + z = 1',
+        '三点在三个坐标轴上的截距都是 1，直接写截距式得 x+y+z=1。'),
+      Q('q6-6', 'ch6', 'basic', 'calc', '求原点 (0,0,0) 到平面 x + 2y + 2z − 3 = 0 的距离。',
+        '套点到平面距离公式 d = |Ax0+By0+Cz0+D|/√(A²+B²+C²)。', '1',
+        'd = |−3|/√(1+4+4) = 3/3 = 1。'),
+      Q('q6-7', 'ch6', 'basic', 'calc', 'a=(2,−1,3)，b=(1,2,−1)，求 a×b。',
+        '按行列式展开，注意第二项取负。', '(−5, 5, 5)',
+        '((−1)(−1)−3·2, 3·1−2·(−1), 2·2−(−1)·1) = (1−6, 3+2, 4+1) = (−5,5,5)。'),
+      Q('q6-8', 'ch6', 'mid', 'calc', '求直线 (x−1)/1 = (y−2)/(−1) = z/2 与平面 2x+y−z = 3 的交点。',
+        '令参数 t，代进平面方程。', '(2, 1, 2)',
+        '点 = (1+t, 2−t, 2t)，代入：2+2t+2−t−2t = 3 ⇒ t = 1，得 (2,1,2)。'),
+
+      Q('q7-5', 'ch7', 'basic', 'calc', 'z = ln(x²+y²)，求 z_x。',
+        '对 x 求偏导，y 视为常数，注意复合。', 'z_x = 2x/(x²+y²)',
+        'z_x = (2x)/(x²+y²)。'),
+      Q('q7-6', 'ch7', 'mid', 'calc', 'z = x^y（x>0），求 z_y。',
+        '对 y 求偏导时把 x 当底数常量。', 'z_y = x^y·ln x',
+        'a^y 型求导：z_y = x^y ln x。'),
+      Q('q7-7', 'ch7', 'hard', 'calc', 'z = e^{xy}，求 z_xy。',
+        '先对 x 求偏导，再对 y 求。', 'z_xy = e^{xy}(1 + xy)',
+        'z_x = y e^{xy}；再对 y 求导：z_xy = e^{xy} + xy e^{xy}。'),
+      Q('q7-8', 'ch7', 'mid', 'calc', '求 z = x² + y² − xy + x + y 的极值。',
+        '解 z_x=0、z_y=0，再用 AC−B² 判别。', '极小值 z(−1,−1) = −1',
+        'z_x=2x−y+1=0，z_y=2y−x+1=0 ⇒ x=y=−1；A=2，B=−1，C=2，AC−B²=3>0 且 A>0，为极小值 −1。'),
+
+      Q('q8-5', 'ch8', 'mid', 'calc', '∫∫_D x dσ，D: 0≤x≤1，x≤y≤1。',
+        '先对 y 积（上下限是 x），再对 x 积。', '1/6',
+        '= ∫_0^1 x(1−x)dx = 1/2 − 1/3 = 1/6。'),
+      Q('q8-6', 'ch8', 'basic', 'calc', 'D 由 y = x² 与 y = x 围成，求 ∫∫_D dσ。',
+        '被积函数为 1 就是面积。', '1/6',
+        '面积 = ∫_0^1 (x − x²)dx = 1/6。'),
+      Q('q8-7', 'ch8', 'mid', 'calc', '∫∫_D √(x²+y²) dσ，D: x²+y² ≤ 4。',
+        '圆域用极坐标，√(x²+y²) = r。', '16π/3',
+        '= ∫_0^{2π}dθ ∫_0^2 r·r dr = 2π·(8/3) = 16π/3。'),
+      Q('q8-8', 'ch8', 'hard', 'calc', '计算 ∫_0^1 dy ∫_y^1 e^{x²} dx。',
+        'e^{x²} 没有初等原函数，必须交换次序。', '(e−1)/2',
+        '交换后 = ∫_0^1 dx ∫_0^x e^{x²}dy = ∫_0^1 x e^{x²}dx = (e−1)/2。'),
+
+      Q('q9-6', 'ch9', 'basic', 'choice', '级数 ∑_{n=1}^∞ 1/(2n+1) 的敛散性是（ ）',
+        '与调和级数 1/n 比较。', '发散',
+        '1/(2n+1) > 1/(3n)，而 ∑1/n 发散，由比较审敛法知原级数发散。'),
+      Q('q9-7', 'ch9', 'basic', 'fill', '∑_{n=1}^∞ 1/3^n = ?',
+        '几何级数，首项 1/3，公比 1/3。', '1/2',
+        '和 = (1/3)/(1−1/3) = 1/2。'),
+      Q('q9-8', 'ch9', 'mid', 'calc', '求幂级数 ∑_{n=0}^∞ (x−1)^n 的收敛域。',
+        '几何级数，|x−1|<1；端点单独验。', '(0, 2)',
+        '|x−1|<1 得 0<x<2；x=0 时 ∑(−1)^n 发散，x=2 时 ∑1 发散，故收敛域为 (0,2)。'),
+      Q('q9-9', 'ch9', 'mid', 'choice', '级数 ∑_{n=1}^∞ (−1)^n/√n 是（ ）',
+        '先看绝对值级数，再用莱布尼茨。', '条件收敛',
+        '∑1/√n 是 p=1/2≤1 的 p 级数，发散；而 1/√n 单调递减趋于 0，原级数收敛，故条件收敛。'),
+      Q('q9-10', 'ch9', 'mid', 'fill', '1/(1+x) 展开成 x 的幂级数 = ?',
+        '把 1/(1−t) = ∑t^n 里的 t 换成 −x。', '∑_{n=0}^∞ (−1)^n x^n（|x|<1）',
+        '1/(1+x) = 1/(1−(−x)) = ∑(−x)^n = ∑(−1)^n x^n，收敛区间 |x|<1。'),
+
+      Q('q10-6', 'ch10', 'basic', 'calc', '解 y′ = y/x，y(1) = 2。',
+        '可分离变量。', 'y = 2x',
+        'dy/y = dx/x ⇒ ln|y| = ln|x| + C ⇒ y = Cx；由 y(1)=2 得 C=2。'),
+      Q('q10-7', 'ch10', 'mid', 'calc', '解 y·y′ = x。',
+        '把 y′ 写成 dy/dx，分离变量。', 'y² = x² + C',
+        'y dy = x dx，两边积分得 y²/2 = x²/2 + C₁，即 y² = x² + C。'),
+      Q('q10-8', 'ch10', 'basic', 'calc', '解 y″ = 6x，y(0) = 1，y′(0) = 0。',
+        '连续积分两次，再代初值。', 'y = x³ + 1',
+        'y′ = 3x² + C₁，由 y′(0)=0 得 C₁=0；y = x³ + C₂，由 y(0)=1 得 C₂=1。'),
+      Q('q10-9', 'ch10', 'basic', 'calc', '解 y″ + 4y = 0。',
+        '特征方程 r²+4=0，共轭复根。', 'y = C1·cos2x + C2·sin2x',
+        'r = ±2i，α=0、β=2，故 y = C1cos2x + C2sin2x。'),
+      Q('q10-10', 'ch10', 'mid', 'calc', '解 y′ − y = e^{2x}。',
+        '一阶线性，P=−1，Q=e^{2x}。', 'y = e^{2x} + C·e^x',
+        'y = e^{x}(∫e^{2x}·e^{−x}dx + C) = e^x(e^x + C) = e^{2x} + C e^x。'),
+    ];
+
+const LEVEL = { basic: '基础', mid: '中档', hard: '提高' };
+const TYPE = { fill: '填空', choice: '选择', calc: '计算', proof: '证明' };
+const CHT = {};
+const ALLPTS = [];
+CHAPTERS.forEach(function (c) {
+  CHT[c.id] = c.title;
+  c.points.forEach(function (p) { ALLPTS.push({ id: p.id, name: p.name, freq: p.freq, ch: c.id, chTitle: c.title }); });
+});
+const PROB = {};
+PROBLEMS.forEach(function (p) { PROB[p.id] = p; });
+
+const KEY = 'gaoshu.mobile.v1';
+let STORAGE_OK = true;
+(function probe() {
+  try { localStorage.setItem('__gs', '1'); localStorage.removeItem('__gs'); }
+  catch (e) { STORAGE_OK = false; }
+})();
+
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+function dayKey(d) { d = d || new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function blank() {
+  return { examDate: '2027-04-11', currentChapter: 'ch1', mastery: {}, formulas: {}, problems: {}, wrong: {}, notes: {}, daily: {},
+    total: { attempts: 0, correct: 0 } };
+}
+function load() {
+  if (!STORAGE_OK) return blank();
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return blank();
+    const s = JSON.parse(raw);
+    const b = blank();
+    return { examDate: s.examDate || b.examDate, currentChapter: s.currentChapter || b.currentChapter,
+      mastery: s.mastery || {}, formulas: s.formulas || {},
+      problems: s.problems || {}, wrong: s.wrong || {}, notes: s.notes || {}, daily: s.daily || {},
+      total: { attempts: (s.total && s.total.attempts) || 0, correct: (s.total && s.total.correct) || 0 } };
+  } catch (e) { return blank(); }
+}
+let state = load();
+function save() {
+  if (!STORAGE_OK) return;
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { STORAGE_OK = false; notice(); }
+}
+function notice() {
+  document.getElementById('notice').innerHTML = STORAGE_OK ? ''
+    : '<div class="warnbar">当前打开方式不能保存进度，请用 Safari / Chrome 直接打开本文件</div>';
+}
+notice();
+
+const ui = { tab: 'overview', search: '', ch: 'all', lv: 'all', todo: false, showResolved: false, open: {}, f: 'all', daily: false };
+
+function day(k) {
+  const d = state.daily[k] || {};
+  return { attempts: d.attempts || 0, correct: d.correct || 0, reviews: d.reviews || 0, mastery: d.mastery || 0 };
+}
+function daysLeft() {
+  const p = String(state.examDate).split('-');
+  if (p.length !== 3) return null;
+  const t = new Date(+p[0], +p[1] - 1, +p[2]);
+  if (isNaN(t)) return null;
+  const n = new Date();
+  const today = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+  return Math.round((t - today) / 86400000);
+}
+function streak() {
+  let n = 0; const d = new Date();
+  if (!(state.daily[dayKey(d)] || {}).attempts) d.setDate(d.getDate() - 1);
+  for (let i = 0; i < 400; i++) {
+    const r = state.daily[dayKey(d)];
+    if (!r || !r.attempts) break;
+    n++; d.setDate(d.getDate() - 1);
+  }
+  return n;
+}
+function masteredCount() { return ALLPTS.filter(function (p) { return state.mastery[p.id] === 2; }).length; }
+
+function seededRandom(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function dailySeed() {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+function scopeProblems() {
+  const cur = state.currentChapter || 'ch1';
+  if (cur === 'all') return PROBLEMS;
+  let idx = -1;
+  CHAPTERS.forEach(function (c, i) { if (c.id === cur) idx = i; });
+  if (idx < 0) return PROBLEMS;
+  const allowed = {};
+  CHAPTERS.slice(0, idx + 1).forEach(function (c) { allowed[c.id] = true; });
+  return PROBLEMS.filter(function (p) { return allowed[p.ch]; });
+}
+function scopeTitle() {
+  const cur = state.currentChapter || 'ch1';
+  if (cur === 'all') return '全部章节';
+  const c = CHAPTERS.filter(function (x) { return x.id === cur; })[0];
+  return c ? c.title.split(' ')[0] : '第一章';
+}
+function dailySet() {
+  const pool = scopeProblems();
+  const target = Math.min(10, pool.length);
+  const rnd = seededRandom(dailySeed());
+  const shuffled = pool.map(function (p) { return { p: p, r: rnd() }; })
+    .sort(function (a, b) { return a.r - b.r; })
+    .map(function (x) { return x.p; });
+  const wrongIds = {};
+  Object.keys(state.wrong).forEach(function (id) { if (!state.wrong[id].resolved) wrongIds[id] = true; });
+  const picks = [];
+  shuffled.forEach(function (p) { if (picks.length < 4 && wrongIds[p.id]) picks.push(p); });
+  shuffled.forEach(function (p) {
+    if (picks.length >= target || wrongIds[p.id] || state.problems[p.id]) return;
+    picks.push(p);
+  });
+  shuffled.forEach(function (p) {
+    if (picks.length >= target || picks.indexOf(p) >= 0) return;
+    picks.push(p);
+  });
+  return picks.slice(0, target);
+}
+function bump(field) {
+  const k = dayKey();
+  const d = Object.assign({ attempts: 0, correct: 0, reviews: 0, mastery: 0 }, state.daily[k] || {});
+  d[field] += 1;
+  state.daily[k] = d;
+}
+function freqPill(f) {
+  if (f === 3) return '<span class="pill hot">高频</span>';
+  if (f === 2) return '<span class="pill">常考</span>';
+  return '<span class="pill">了解</span>';
+}
+function mastLabel(v) { return v === 2 ? '已掌握' : v === 1 ? '学过' : '未学'; }
+
+function viewOverview() {
+  const t = day(dayKey());
+  const total = ALLPTS.length, got = masteredCount();
+  const acc = state.total.attempts ? Math.round(state.total.correct / state.total.attempts * 100) : 0;
+  const dl = daysLeft();
+  const next = ALLPTS.filter(function (p) { return state.mastery[p.id] !== 2; }).slice(0, 3);
+  const todayWrong = Object.keys(state.wrong).filter(function (id) {
+    return !state.wrong[id].resolved && dayKey(new Date(state.wrong[id].at || 0)) === dayKey();
+  }).slice(0, 3);
+  let h = '';
+  h += '<div class="grid2" style="margin-bottom:12px">';
+  h += '<div class="card stat"><div class="k">距考试</div><div class="v">' + (dl === null ? '—' : Math.max(dl, 0)) + '<i>天</i></div></div>';
+  h += '<div class="card stat"><div class="k">已掌握考点</div><div class="v">' + got + '<i>/' + total + '</i></div><div class="bar"><i style="width:' + (total ? got / total * 100 : 0) + '%"></i></div></div>';
+  h += '<div class="card stat"><div class="k">累计练习</div><div class="v">' + state.total.attempts + '<i>道</i></div><div class="small dim">正确率 ' + acc + '%</div></div>';
+  h += '<div class="card stat"><div class="k">连续打卡</div><div class="v">' + streak() + '<i>天</i></div></div>';
+  h += '</div>';
+
+  h += '<div class="card"><h3>今日任务<span class="sp">' + dayKey() + '</span></h3>';
+  const plan = [
+    ['练习 10 道题', t.attempts >= 10, t.attempts + '/10'],
+    ['复习 3 道错题', t.reviews >= 3, t.reviews + '/3'],
+    ['掌握 1 个新考点', t.mastery >= 1, t.mastery + '/1']
+  ];
+  plan.forEach(function (p) {
+    h += '<div class="row"><span class="chk ' + (p[1] ? 'on' : '') + '">✓</span><span class="grow ' + (p[1] ? 'dim' : '') + '">' + p[0] + '</span><span class="small dim">' + p[2] + '</span></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="card"><h3>接下来学这些</h3>';
+  if (next.length) {
+    next.forEach(function (p) {
+      h += '<div class="row" data-act="goChapter" data-ch="' + p.ch + '"><div class="grow">'
+        + '<div class="clip">' + esc(p.name) + '</div><div class="small dim clip">' + esc(p.chTitle) + '</div></div>'
+        + freqPill(p.freq) + '</div>';
+    });
+  } else {
+    h += '<div class="dim small">全部考点都标为已掌握了。</div>';
+  }
+  h += '</div>';
+
+  h += '<div class="card"><h3>章节进度<span class="sp">' + (total ? Math.round(got / total * 100) : 0) + '%</span></h3>';
+  CHAPTERS.forEach(function (c) {
+    const n = c.points.length, g = c.points.filter(function (p) { return state.mastery[p.id] === 2; }).length;
+    h += '<div class="row"><div class="grow"><div class="small clip">' + esc(c.title) + '</div>'
+      + '<div class="bar"><i style="width:' + (n ? g / n * 100 : 0) + '%"></i></div></div>'
+      + '<span class="small dim">' + g + '/' + n + '</span></div>';
+  });
+  h += '</div>';
+
+  h += '<div class="card"><h3>今日错题</h3>';
+  if (todayWrong.length) {
+    todayWrong.forEach(function (id) {
+      const p = PROB[id];
+      if (!p) return;
+      h += '<div class="row" data-act="goWrong"><div class="grow q clip" style="font-size:13px">' + esc(p.q) + '</div><span class="pill hot">错</span></div>';
+    });
+  } else {
+    h += '<div class="dim small">今天还没有错题，继续保持。</div>';
+  }
+  h += '</div>';
+
+  h += '<div class="card"><h3>设置</h3>'
+    + '<div class="row"><span class="grow">学习进度</span><select class="inp" style="width:150px" id="chap">'
+    + CHAPTERS.map(function (c) { return '<option value="' + c.id + '"' + ((state.currentChapter || 'ch1') === c.id ? ' selected' : '') + '>' + esc(c.title.split(' ')[0]) + '</option>'; }).join('')
+    + '<option value="all"' + (state.currentChapter === 'all' ? ' selected' : '') + '>全部章节</option>'
+    + '</select></div>'
+    + '<div class="row"><span class="grow">考试日期</span><input class="inp" style="width:150px" type="date" id="exam" value="' + state.examDate + '"></div>'
+    + '<div class="row"><span class="grow small dim">记录只存在这台手机浏览器里</span>'
+    + '<button class="btn g" data-act="reset">清空</button></div></div>';
+  return h;
+}
+
+function viewSyllabus() {
+  let h = '<div class="chips">'
+    + chip('f-all', '全部', ui.f === 'all') + chip('f-todo', '未掌握', ui.f === 'todo') + chip('f-hot', '仅高频', ui.f === 'hot')
+    + '</div>';
+  CHAPTERS.forEach(function (c) {
+    const pts = c.points.filter(function (p) {
+      if (ui.f === 'todo' && state.mastery[p.id] === 2) return false;
+      if (ui.f === 'hot' && p.freq !== 3) return false;
+      return true;
+    });
+    if (!pts.length) return;
+    const g = c.points.filter(function (p) { return state.mastery[p.id] === 2; }).length;
+    const open = ui.open[c.id] || ui.f !== 'all';
+    h += '<details class="chap" data-ch="' + c.id + '"' + (open ? ' open' : '') + '>'
+      + '<summary><span class="grow" style="font-weight:600;font-size:14px">' + esc(c.title) + '</span>'
+      + '<span class="pill">' + c.weight + '</span><span class="small dim">' + g + '/' + c.points.length + '</span></summary>'
+      + '<div class="bar" style="margin:0 14px"><i style="width:' + (c.points.length ? g / c.points.length * 100 : 0) + '%"></i></div>'
+      + '<div class="bd">';
+    pts.forEach(function (p) {
+      const v = state.mastery[p.id] || 0;
+      h += '<div class="row" style="align-items:flex-start"><div class="grow">'
+        + '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' + esc(p.name) + freqPill(p.freq) + '</div>'
+        + '<div class="small dim">' + esc(p.tip) + '</div></div>'
+        + '<button class="pill ' + (v === 2 ? 'ok' : v === 1 ? 'warn' : '') + '" style="height:26px;padding:0 10px" data-act="mast" data-p="' + p.id + '">' + mastLabel(v) + '</button>'
+        + '</div>';
+    });
+    h += '</div></details>';
+  });
+  return h;
+}
+
+function chip(act, label, on) {
+  return '<button class="btn ' + (on ? 'on' : 'g') + '" data-act="' + act + '">' + label + '</button>';
+}
+
+function formulaList() {
+  const q = ui.search.trim().toLowerCase();
+  let h = '';
+  const groups = [];
+  FORMULAS.forEach(function (f) {
+    if (q && (f.name + f.expr + f.note + f.group).toLowerCase().indexOf(q) < 0) return;
+    let g = groups.filter(function (x) { return x.name === f.group; })[0];
+    if (!g) { g = { name: f.group, items: [] }; groups.push(g); }
+    g.items.push(f);
+  });
+  if (!groups.length) return '<div class="empty">没有匹配的公式</div>';
+  groups.forEach(function (g) {
+    h += '<div class="card"><h3>' + esc(g.name) + '<span class="sp">' + g.items.length + '</span></h3>';
+    g.items.forEach(function (f) {
+      const done = !!state.formulas[f.id];
+      h += '<div style="border-top:1px solid var(--line);padding:10px 0">'
+        + '<div class="small dim" style="display:flex;align-items:center;gap:8px;margin-bottom:5px">'
+        + '<span style="color:var(--txt);font-weight:600">' + esc(f.name) + '</span>'
+        + '<button class="pill ' + (done ? 'ok' : '') + '" style="margin-left:auto;height:24px" data-act="fmem" data-f="' + f.id + '">' + (done ? '✓ 已背' : '标记已背') + '</button></div>'
+        + '<div class="eq">' + esc(f.expr) + '</div>'
+        + (f.note ? '<div class="small dim" style="margin-top:5px">' + esc(f.note) + '</div>' : '')
+        + '</div>';
+    });
+    h += '</div>';
+  });
+  return h;
+}
+
+function viewFormulas() {
+  const done = FORMULAS.filter(function (f) { return state.formulas[f.id]; }).length;
+  return '<div class="card" style="padding:10px 12px">'
+    + '<input class="inp" id="search" placeholder="搜索公式或知识点…" value="' + esc(ui.search) + '">'
+    + '<div class="small dim" style="margin-top:6px">已背 ' + done + ' / ' + FORMULAS.length + '</div></div>'
+    + '<div id="flist">' + formulaList() + '</div>';
+}
+
+function viewPractice() {
+  let h = '<div class="chips">'
+    + '<button class="btn ' + (ui.daily ? 'on' : 'g') + '" data-act="daily">今日一练</button>'
+    + '<select class="btn" id="fch" style="flex:none">'
+    + '<option value="all"' + (ui.ch === 'all' ? ' selected' : '') + '>全部章节</option>'
+    + CHAPTERS.map(function (c) { return '<option value="' + c.id + '"' + (ui.ch === c.id ? ' selected' : '') + '>' + esc(c.title.split(' ')[0]) + '</option>'; }).join('')
+    + '</select>';
+  ['all', 'basic', 'mid', 'hard'].forEach(function (lv) {
+    h += '<button class="btn ' + (ui.lv === lv ? 'on' : 'g') + '" data-act="lv" data-lv="' + lv + '">' + (lv === 'all' ? '全部' : LEVEL[lv]) + '</button>';
+  });
+  h += '<button class="btn ' + (ui.todo ? 'on' : 'g') + '" data-act="todo">只看未做</button></div>';
+
+  const list = ui.daily ? dailySet() : PROBLEMS.filter(function (p) {
+    if (ui.ch !== 'all' && p.ch !== ui.ch) return false;
+    if (ui.lv !== 'all' && p.level !== ui.lv) return false;
+    if (ui.todo && state.problems[p.id]) return false;
+    return true;
+  });
+  const done = PROBLEMS.filter(function (p) { return state.problems[p.id]; }).length;
+  const dDone = dailySet().filter(function (p) { return state.problems[p.id]; }).length;
+  h += '<div class="small dim" style="margin:0 0 10px">'
+    + (ui.daily ? '今日一练 · ' + scopeTitle() + ' · 每天 0 点换题 · 已完成 ' + dDone + '/' + dailySet().length : '已做 ' + done + ' / ' + PROBLEMS.length)
+    + '</div>';
+
+  if (!list.length) return h + '<div class="empty">这个筛选下没有题目</div>';
+
+  list.forEach(function (p) {
+    const r = state.problems[p.id];
+    const o = ui.open;
+    h += '<div class="card">'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'
+      + '<span class="pill">' + esc(CHT[p.ch].split(' ')[0]) + '</span>'
+      + '<span class="pill">' + TYPE[p.type] + '</span>'
+      + '<span class="pill">' + LEVEL[p.level] + '</span>'
+      + (r ? '<span class="pill ' + (r.result === 'right' ? 'ok' : 'hot') + '">' + (r.result === 'right' ? '✓ 做对' : '✗ 做错') + '</span>' : '')
+      + '</div>'
+      + '<div class="q">' + esc(p.q) + '</div>'
+      + (o[p.id + ':h'] ? '<div class="sol"><b>提示：</b>' + esc(p.hint) + '</div>' : '')
+      + (o[p.id + ':a'] ? '<div class="sol"><b>答案：</b>' + esc(p.answer) + '</div>' : '')
+      + (o[p.id + ':s'] ? '<div class="sol"><b>解析：</b>' + esc(p.sol) + '</div>' : '')
+      + '<div class="acts">'
+      + '<button class="btn g" data-act="tog" data-k="' + p.id + ':h">提示</button>'
+      + '<button class="btn g" data-act="tog" data-k="' + p.id + ':a">答案</button>'
+      + '<button class="btn g" data-act="tog" data-k="' + p.id + ':s">解析</button>'
+      + '</div>'
+      + '<div class="acts">'
+      + '<button class="btn p" data-act="mark" data-p="' + p.id + '" data-ok="1">我答对了</button>'
+      + '<button class="btn" data-act="mark" data-p="' + p.id + '" data-ok="0">答错了</button>'
+      + '</div></div>';
+  });
+  return h;
+}
+
+function viewWrong() {
+  const entries = Object.keys(state.wrong).map(function (id) {
+    return PROB[id] ? { p: PROB[id], w: state.wrong[id] } : null;
+  }).filter(Boolean)
+    .filter(function (e) { return ui.showResolved || !e.w.resolved; })
+    .sort(function (a, b) { return (a.w.resolved ? 1 : 0) - (b.w.resolved ? 1 : 0) || (b.w.at || 0) - (a.w.at || 0); });
+
+  const pending = Object.keys(state.wrong).filter(function (id) { return !state.wrong[id].resolved; }).length;
+  let h = '<div class="chips"><button class="btn ' + (ui.showResolved ? 'on' : 'g') + '" data-act="resolved">显示已掌握</button>'
+    + '<span class="small dim" style="align-self:center;margin-left:auto">' + pending + ' 道待复习</span></div>';
+
+  if (!entries.length) return h + '<div class="empty">错题本还是空的，做错的题会自动进来</div>';
+
+  entries.forEach(function (e) {
+    const p = e.p, w = e.w;
+    h += '<div class="card">'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'
+      + '<span class="pill">' + esc(CHT[p.ch].split(' ')[0]) + '</span>'
+      + '<span class="pill hot">错 ' + w.count + ' 次</span>'
+      + (w.resolved ? '<span class="pill ok">已掌握</span>' : '')
+      + '</div>'
+      + '<div class="q">' + esc(p.q) + '</div>'
+      + '<div class="sol"><b>答案：</b>' + esc(p.answer) + '</div>'
+      + (ui.open[p.id + ':s'] ? '<div class="sol"><b>解析：</b>' + esc(p.sol) + '</div>' : '')
+      + '<div class="small dim" style="margin-top:10px">我的错因</div>'
+      + '<textarea class="inp" data-note="' + p.id + '" placeholder="错在哪：符号？换元？忘记 +C？">' + esc(state.notes[p.id] || '') + '</textarea>'
+      + '<div class="acts">'
+      + '<button class="btn g" data-act="tog" data-k="' + p.id + ':s">' + (ui.open[p.id + ':s'] ? '收起解析' : '查看解析') + '</button>'
+      + '<button class="btn p" data-act="review" data-p="' + p.id + '">再练一次（答对）</button>'
+      + (w.resolved ? '' : '<button class="btn" data-act="resolve" data-p="' + p.id + '">标记已掌握</button>')
+      + '</div></div>';
+  });
+  return h;
+}
+
+function render() {
+  const y = window.scrollY;
+  const v = document.getElementById('view');
+  if (ui.tab === 'overview') v.innerHTML = viewOverview();
+  else if (ui.tab === 'syllabus') v.innerHTML = viewSyllabus();
+  else if (ui.tab === 'formulas') v.innerHTML = viewFormulas();
+  else if (ui.tab === 'practice') v.innerHTML = viewPractice();
+  else v.innerHTML = viewWrong();
+
+  const dl = daysLeft();
+  document.getElementById('cd').textContent = dl === null ? '—' : Math.max(dl, 0);
+  Array.prototype.forEach.call(document.querySelectorAll('#tabs button'), function (b) {
+    b.classList.toggle('on', b.getAttribute('data-tab') === ui.tab);
+  });
+  window.scrollTo(0, y);
+}
+
+document.getElementById('tabs').addEventListener('click', function (e) {
+  const b = e.target.closest('button[data-tab]');
+  if (!b) return;
+  ui.tab = b.getAttribute('data-tab');
+  window.scrollTo(0, 0);
+  render();
+});
+
+document.getElementById('view').addEventListener('click', function (e) {
+  const el = e.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.getAttribute('data-act');
+
+  if (act === 'f-all' || act === 'f-todo' || act === 'f-hot') { ui.f = act.slice(2); render(); return; }
+  if (act === 'lv') { ui.lv = el.getAttribute('data-lv'); render(); return; }
+  if (act === 'todo') { ui.todo = !ui.todo; render(); return; }
+  if (act === 'daily') { ui.daily = !ui.daily; render(); return; }
+  if (act === 'resolved') { ui.showResolved = !ui.showResolved; render(); return; }
+  if (act === 'tog') { const k = el.getAttribute('data-k'); ui.open[k] = !ui.open[k]; render(); return; }
+  if (act === 'goChapter') {
+    const ch = el.getAttribute('data-ch');
+    ui.open[ch] = true; ui.f = 'all'; ui.tab = 'syllabus'; render(); return;
+  }
+  if (act === 'goWrong') { ui.tab = 'wrong'; render(); return; }
+
+  if (act === 'mast') {
+    const id = el.getAttribute('data-p');
+    const cur = state.mastery[id] || 0;
+    const nxt = (cur + 1) % 3;
+    state.mastery[id] = nxt;
+    if (nxt === 2 && cur !== 2) bump('mastery');
+    save(); render(); return;
+  }
+  if (act === 'fmem') {
+    const id = el.getAttribute('data-f');
+    if (state.formulas[id]) delete state.formulas[id]; else state.formulas[id] = true;
+    save(); render(); return;
+  }
+  if (act === 'mark') {
+    const id = el.getAttribute('data-p'), ok = el.getAttribute('data-ok') === '1';
+    bump('attempts'); if (ok) bump('correct');
+    state.total.attempts += 1; if (ok) state.total.correct += 1;
+    state.problems[id] = { result: ok ? 'right' : 'wrong', at: Date.now() };
+    const w = state.wrong[id];
+    if (!ok) {
+      state.wrong[id] = { count: (w ? w.count : 0) + 1, right: 0, resolved: false, at: Date.now() };
+    } else if (w) {
+      const right = (w.right || 0) + 1;
+      state.wrong[id] = { count: w.count, right: right, resolved: right >= 2 ? true : !!w.resolved, at: Date.now() };
+    }
+    save(); render(); return;
+  }
+  if (act === 'review') {
+    const id = el.getAttribute('data-p');
+    bump('reviews');
+    const w = state.wrong[id];
+    const right = ((w && w.right) || 0) + 1;
+    if (w) state.wrong[id] = { count: w.count, right: right, resolved: right >= 2 ? true : !!w.resolved, at: Date.now() };
+    state.problems[id] = { result: 'right', at: Date.now() };
+    save(); render(); return;
+  }
+  if (act === 'resolve') {
+    const id = el.getAttribute('data-p');
+    bump('reviews');
+    if (state.wrong[id]) state.wrong[id] = Object.assign({}, state.wrong[id], { resolved: true, at: Date.now() });
+    save(); render(); return;
+  }
+  if (act === 'reset') {
+    if (window.confirm('确定清空所有学习记录吗？')) { state = blank(); save(); render(); }
+    return;
+  }
+});
+
+document.getElementById('view').addEventListener('input', function (e) {
+  const t = e.target;
+  if (t.id === 'exam') {
+    state.examDate = t.value; save();
+    const dl = daysLeft();
+    document.getElementById('cd').textContent = dl === null ? '—' : Math.max(dl, 0);
+    return;
+  }
+  if (t.id === 'search') {
+    ui.search = t.value;
+    const box = document.getElementById('flist');
+    if (box) box.innerHTML = formulaList();
+    return;
+  }
+  if (t.hasAttribute('data-note')) {
+    state.notes[t.getAttribute('data-note')] = t.value;
+    clearTimeout(window.__nt);
+    window.__nt = setTimeout(save, 400);
+  }
+});
+
+document.getElementById('view').addEventListener('change', function (e) {
+  if (e.target.id === 'fch') { ui.ch = e.target.value; render(); }
+  if (e.target.id === 'chap') { state.currentChapter = e.target.value; save(); render(); }
+});
+
+document.getElementById('view').addEventListener('toggle', function (e) {
+  const d = e.target;
+  if (d.tagName === 'DETAILS' && d.getAttribute('data-ch')) ui.open[d.getAttribute('data-ch')] = d.open;
+}, true);
+
+render();
+</script>
+<script>
+if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function () {});
+  });
+}
+</script>
+</body>
+</html>
