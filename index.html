@@ -2333,13 +2333,21 @@ function PlanView(props) {
           },
         }, '按重排执行（改用 ' + Math.min(20, perDay + Math.ceil(prog.behind / 14)) + ' 题/天）') : null)),
     h(Card, null,
-      h('h3', null, '模块与天数'),
-      MODULES.map(function (m) {
+      h('h3', null, '模块安排', h('span', { className: 'n' }, '建议天数 / 已做 / 掌握度')),
+      MODULES.filter(function (m) { return state.modules[m.id]; }).map(function (m) {
+        const v = masteryOf(state, m.id);
+        const cur = state.currentModule === m.id;
+        const tone = v.value == null ? null : v.value >= 80 ? 'ok' : v.value >= 60 ? 'warn' : 'hot';
         return h('div', { key: m.id, className: 'mtc-row' },
-          h('span', { className: 'grow mtc-small' }, m.name),
+          h('span', { className: 'mtc-small', style: { width: 128, flex: 'none' } }, m.name,
+            cur ? h('span', { style: { marginLeft: 6 } }, h(Pill, { tone: 'ok' }, '在学')) : null),
           h(Pill, null, m.days + ' 天'),
-          h(Pill, { tone: state.modules[m.id] ? 'ok' : null }, state.modules[m.id] ? '考' : '不考'));
-      })));
+          h('div', { className: 'grow' }, h(Bar, { value: v.value == null ? 0 : v.value })),
+          h('span', { className: 'mtc-small mtc-muted', style: { width: 92, textAlign: 'right', flex: 'none' } },
+            v.done + ' 题 · ' + (v.value == null ? '样本不足' : v.value + '%')),
+          h(Pill, { tone: tone }, v.value == null ? '未开' : v.value >= 80 ? '达标' : '在练'));
+      }),
+      h('div', { className: 'mtc-small mtc-muted', style: { marginTop: 10 } }, '达标线：模块小测 ≥60% 继续推进，≥80% 可跳到下一模块。')));
 }
 
 /* ================= 模考 ================= */
