@@ -1111,6 +1111,7 @@ const CSS = [
   '.mtc-cmd-help{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}',
   '.mtc-cmd-chip{appearance:none;border:1px dashed var(--dsw-alias-border-l2);background:transparent;border-radius:999px;color:var(--dsw-alias-label-secondary);font:inherit;font-size:11.5px;padding:4px 9px;cursor:pointer}',
   '.mtc-cmd-chip:hover{border-style:solid;color:var(--dsw-alias-brand-primary)}',
+  '.mtc-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--dsw-alias-brand-primary);color:#fff;border-radius:999px;padding:9px 16px;font-size:12.5px;max-width:88vw;box-shadow:0 8px 24px rgba(47,111,94,.28);z-index:20;text-align:center}',
   '.mtc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}',
   '.mtc-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}',
   '.mtc-card{background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:var(--mtc-shadow)}',
@@ -1220,6 +1221,14 @@ function PracticeView(props) {
   const [results, setResults] = useState([]);
   const [seed, setSeed] = useState(function () { return Date.now(); });
   const [cause, setCause] = useState('');
+  const [left, setLeft] = useState(function () { return preset && preset.timed ? Math.round(preset.timed * 60) : 0; });
+  const daily = !!(preset && preset.daily);
+
+  useEffect(function () {
+    if (!(preset && preset.timed)) return undefined;
+    const t = setInterval(function () { setLeft(function (x) { return x > 0 ? x - 1 : 0; }); }, 1000);
+    return function () { clearInterval(t); };
+  }, []);
 
   useEffect(function () {
     if (preset && preset.auto) build();
@@ -1231,7 +1240,20 @@ function PracticeView(props) {
 
   function build() {
     let ids;
-    if (mode === 'review') {
+    if (preset && preset.daily) {
+      const week = Date.now() - 7 * DAY;
+      const recent = state.mistakes
+        .filter(function (m) { return (m.addedAt || 0) >= week; })
+        .sort(function (a, b) { return (b.addedAt || 0) - (a.addedAt || 0); })
+        .slice(0, 3)
+        .map(function (m) { return m.id; });
+      const pool = BANK.filter(function (q) {
+        if (!state.modules[q.m]) return false;
+        if (q.t === '证明' && !state.settings.proof) return false;
+        return recent.indexOf(q.id) < 0;
+      }).map(function (q) { return q.id; });
+      ids = recent.concat(shuffled(pool, seed).slice(0, Math.max(0, cfg.n - recent.length)));
+    } else if (mode === 'review') {
       ids = dueMistakes(state).map(function (m) { return m.id; });
     } else {
       const pool = BANK.filter(function (q) {
@@ -1244,7 +1266,9 @@ function PracticeView(props) {
       ids = pool.map(function (q) { return q.id; });
     }
     if (!ids.length) return;
-    const list = shuffled(ids, seed + cfg.m.length * 31 + cfg.d * 17).slice(0, mode === 'review' ? ids.length : cfg.n);
+    const list = preset && preset.daily
+      ? ids
+      : shuffled(ids, seed + cfg.m.length * 31 + cfg.d * 17).slice(0, mode === 'review' ? ids.length : cfg.n);
     setQueue(list);
     setIdx(0);
     setResults([]);
@@ -1343,21 +1367,28 @@ function PracticeView(props) {
   if (idx >= queue.length) {
     const right = results.filter(function (r) { return r.ok; }).length;
     const total = results.length || 1;
+    const wrongQs = results.filter(function (r) { return !r.ok; }).map(function (r) { return BANK_MAP[r.id]; }).filter(Boolean);
+    const worst = wrongQs[0];
+    const conclusion = !wrongQs.length
+      ? '全对，明天把难度升一档。'
+      : MOD_MAP[worst.m].name + ' · ' + worst.kp + ' 还不够稳，明天先修这一块。';
     return h('div', null,
       h(Card, null,
-        h('h3', null, '本组完成'),
+        h('h3', null, daily ? '日测完成' : '本组完成'),
         h('div', { className: 'mtc-grid' },
           h(Stat, { k: '正确', v: right + '/' + results.length }),
           h(Stat, { k: '正确率', v: pct(right / total) + '%' })),
+        daily ? h('div', { className: 'mtc-feedback' + (wrongQs.length ? '' : ' good') },
+          h('div', null, '今日一句话结论：', conclusion)) : null,
         h('div', { className: 'mtc-actions' },
-          h(Btn, { tone: 'primary', onClick: function () { setQueue(null); setSeed(Date.now()); } }, '再来一组'),
+          h(Btn, { tone: 'primary', onClick: function () { setQueue(null); setSeed(Date.now()); } }, daily ? '再来一次日测' : '再来一组'),
           h(Btn, { onClick: props.nav.bind(null, 'today') }, '回今日'))));
   }
 
   return h('div', null,
     h(Card, null,
-      h('h3', null, mode === 'review' ? '错题复习' : '练习',
-        h('span', { className: 'n' }, (idx + 1) + ' / ' + queue.length)),
+      h('h3', null, daily ? '日测' : mode === 'review' ? '错题复习' : '练习',
+        h('span', { className: 'n' }, (idx + 1) + ' / ' + queue.length + (preset && preset.timed && left ? ' · 剩 ' + Math.floor(left / 60) + ':' + pad2(left % 60) : ''))),
       h(QuestionBlock, { q: cur }),
 
       cur.t === '选择' ? h('div', null, cur.opt.map(function (o, i) {
@@ -1901,7 +1932,11 @@ function parseCommand(text, state) {
     return { tab: 'cards', preset: { m: mod || 'all' }, msg: '卡片：' + (mod ? MOD_MAP[mod].name : '全部模块') + '。' };
   }
   if (cmd === '日测' || cmd === '测') {
-    return { tab: 'practice', preset: { m: 'all', d: 0, n: 5, auto: true }, msg: '日测 5 题，限时 15 分钟，做完看正确率。' };
+    return {
+      tab: 'practice',
+      preset: { m: 'all', d: 0, n: 5, daily: true, timed: 15, auto: true },
+      msg: '日测 5 题 = 近 7 天错题 3 道 + 滚动 2 道，限时 15 分钟。',
+    };
   }
   if (cmd === '模考' || cmd === '考试') {
     return { tab: 'exam', msg: '模考：填空 25 + 选择 25 + 计算 80 + 证明 20，150 分钟。' };
@@ -2037,6 +2072,12 @@ function CoachPage() {
 
   const left = daysUntil(state.examDate);
 
+  useEffect(function () {
+    if (!cmdMsg || cmdOpen) return undefined;
+    const t = setTimeout(function () { setCmdMsg(''); }, 3600);
+    return function () { clearTimeout(t); };
+  }, [cmdMsg, cmdOpen]);
+
   function nav(next, params) {
     setPreset(params || null);
     setTab(next || 'today');
@@ -2046,6 +2087,7 @@ function CoachPage() {
     if (!res) return;
     if (res.tab) nav(res.tab, res.preset || null);
     setCmdMsg(res.msg || '');
+    if (res.tab) setCmdOpen(false);
   }
 
   const common = { state: state, set: setState, nav: nav };
@@ -2095,7 +2137,8 @@ function CoachPage() {
         state: state, msg: cmdMsg, onRun: runCommand,
         onClose: function () { setCmdOpen(false); },
       }) : null,
-      body));
+      body,
+      cmdMsg && !cmdOpen ? h('div', { className: 'mtc-toast' }, cmdMsg) : null));
 }
 
 /* ===== app-pwa.js ===== */
