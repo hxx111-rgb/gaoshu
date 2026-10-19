@@ -2052,7 +2052,11 @@ function CoachPage() {
 
   let body = null;
   if (tab === 'today') body = h(TodayView, common);
-  else if (tab === 'practice') body = h(PracticeView, Object.assign({}, common, { preset: preset, key: preset && preset.review ? 'review' : 'practice' }));
+  else if (tab === 'practice') body = h(PracticeView, Object.assign({}, common, {
+    preset: preset,
+    mode: preset && preset.review ? 'review' : 'practice',
+    key: preset ? JSON.stringify(preset) : 'default',
+  }));
   else if (tab === 'mistakes') body = h(MistakesView, common);
   else if (tab === 'formulas') body = h(FormulasView, Object.assign({}, common, { preset: preset }));
   else if (tab === 'cards') body = h(CardsView, Object.assign({}, common, { preset: preset }));
