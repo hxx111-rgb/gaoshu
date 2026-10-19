@@ -2671,6 +2671,26 @@ function LearnView(props) {
       h('div', { className: 'mtc-small mtc-muted', style: { marginTop: 8 } }, '打个比方：', info.analogy),
       h('div', { className: 'mtc-small', style: { marginTop: 8 } }, h(Pill, { tone: 'warn' }, '注意'), h(MathText, { text: info.watch }))),
 
+    (function () {
+      const mine = state.mistakes.filter(function (m) { return m.m === modId && !m.mastered; });
+      if (!mine.length) return null;
+      const byKp = {};
+      mine.forEach(function (m) {
+        const k = m.kp || '未分类';
+        byKp[k] = (byKp[k] || 0) + 1;
+      });
+      const rows = Object.keys(byKp).sort(function (a, b) { return byKp[b] - byKp[a]; }).slice(0, 3);
+      return h(Card, null,
+        h('h3', null, '这块的旧账', h('span', { className: 'n' }, '错题 ' + mine.length + ' 条未清')),
+        rows.map(function (k) {
+          return h('div', { key: k, className: 'mtc-row' },
+            h('span', { className: 'grow mtc-small' }, h(MathText, { text: k })),
+            h(Pill, { tone: 'hot' }, byKp[k] + ' 条'));
+        }),
+        h('div', { className: 'mtc-actions' },
+          h(Btn, { tone: 'primary', onClick: function () { props.nav('practice', { review: true, auto: true }); } }, '去复习错题')));
+    })(),
+
     h(Card, null,
       h('h3', null, '必背公式', h('span', { className: 'n' }, '★ 是这一层的核心')),
       must.length ? must.map(function (f, i) {
