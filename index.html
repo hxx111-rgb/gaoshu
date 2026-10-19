@@ -1181,13 +1181,14 @@ function defaultState() {
     examDate: DEFAULT_EXAM,
     target: DEFAULT_TARGET,
     modules: defaultModules(),
-    settings: { theme: 'light', dailyQuestions: 12, mathMinutes: 120, daysPerWeek: 5 },
+    settings: { theme: 'light', dailyQuestions: 12, mathMinutes: 120, daysPerWeek: 5, proof: true },
     currentModule: 'm1',
     bank: {},
     attempts: [],
     mistakes: seededMistakes(),
     dayStats: {},
     planSkips: [],
+    exams: [],
     createdAt: Date.now(),
   };
 }
@@ -1212,6 +1213,7 @@ function loadState() {
       mistakes: Array.isArray(saved.mistakes) ? saved.mistakes : [],
       dayStats: saved.dayStats && typeof saved.dayStats === 'object' ? saved.dayStats : {},
       planSkips: Array.isArray(saved.planSkips) ? saved.planSkips : [],
+      exams: Array.isArray(saved.exams) ? saved.exams : [],
       createdAt: saved.createdAt || Date.now(),
     };
   } catch (err) { return base; }
@@ -2074,7 +2076,14 @@ function PlanView(props) {
             key: n, on: perDay === n,
             onClick: function () { props.set(s => Object.assign({}, s, { settings: Object.assign({}, s.settings, { dailyQuestions: n }) })); },
           }, String(n));
-        }))),
+        }),
+        prog.behind > 0 ? h(Btn, {
+          tone: 'primary',
+          onClick: function () {
+            const target = Math.min(20, perDay + Math.ceil(prog.behind / 14));
+            props.set(s => Object.assign({}, s, { settings: Object.assign({}, s.settings, { dailyQuestions: target }) }));
+          },
+        }, '按重排执行（改用 ' + Math.min(20, perDay + Math.ceil(prog.behind / 14)) + ' 题/天）') : null)),
     h(Card, null,
       h('h3', null, '模块与天数'),
       MODULES.map(function (m) {
@@ -2138,7 +2147,18 @@ function ExamView(props) {
     });
     const mods = Object.keys(loss).sort(function (a, b) { return loss[b] - loss[a]; });
     setResult({ got: got, loss: loss, secs: secs, worst: mods[0] || null });
+    props.set(function (st) {
+      let s2 = st;
+      secs.forEach(function (x) { s2 = recordAttempt(s2, x.id, x.got >= x.per, '', 0); });
+      return Object.assign({}, s2, {
+        exams: (s2.exams || []).concat([{ at: Date.now(), got: got, worst: mods[0] || null, n: secs.length }]).slice(-8),
+      });
+    });
   }
+
+  useEffect(function () {
+    if (paper && !result && left === 0) finish();
+  }, [left, paper, result]);
 
   if (!paper) {
     return h(Card, null,
@@ -2162,6 +2182,15 @@ function ExamView(props) {
             h('span', { className: 'mtc-small', style: { width: 150, flex: 'none' } }, MOD_MAP[k].name),
             h('div', { className: 'grow' }, h(Bar, { value: result.loss[k] * 3 })),
             h('span', { className: 'mtc-small', style: { width: 56, textAlign: 'right', flex: 'none' } }, '-' + result.loss[k] + ' 分'));
+        }),
+        h('h3', { style: { marginTop: 16 } }, '最近模考',
+          h('span', { className: 'n' }, '共 ' + (state.exams || []).length + ' 套')),
+        (state.exams || []).slice(-3).reverse().map(function (x, i) {
+          const d = new Date(x.at);
+          return h('div', { key: i, className: 'mtc-row' },
+            h('span', { className: 'mtc-small grow' }, (d.getMonth() + 1) + '月' + d.getDate() + '日 · ' + x.n + ' 题'),
+            h('span', { className: 'mtc-small mtc-muted' }, x.worst && MOD_MAP[x.worst] ? '最弱：' + MOD_MAP[x.worst].short : '无失分'),
+            h('span', { className: 'mtc-small', style: { width: 56, textAlign: 'right', flex: 'none' } }, x.got + ' 分'));
         }),
         h('div', { className: 'mtc-feedback' }, '下一步只修一块：' + worstName + '。其余模块先放着。'),
         h('div', { className: 'mtc-actions' },
@@ -2395,7 +2424,7 @@ function LearnView(props) {
 /* ---------- 命令栏：/练 /学 /复习 /公式 /卡片 /日测 /模考 /规划 /状态 ---------- */
 const CMD_HELP = [
   ['/练 极限 中档 5', '按模块·难度·题数练习'],
-  ['/学 积分', '基础 3 题入手'],
+  ['/学 积分', '知识地图 + 必背公式 + 3 道阶梯例题'],
   ['/复习', '到期错题'],
   ['/公式 极坐标', '搜公式库'],
   ['/卡片 级数', '背公式卡片'],
