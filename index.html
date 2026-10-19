@@ -1175,6 +1175,36 @@ function shuffled(list, seed) {
 }
 function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
 function pct(n) { return Math.round(clamp(n, 0, 1) * 100); }
+const WEEK = ['日', '一', '二', '三', '四', '五', '六'];
+function last7Days(state) {
+  const out = [];
+  for (let i = 6; i >= 0; i -= 1) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = dayKey(d);
+    const rec = (state.dayStats && state.dayStats[key]) || { questions: 0, right: 0 };
+    out.push({
+      key: key,
+      label: i === 0 ? '今天' : '周' + WEEK[d.getDay()],
+      questions: rec.questions || 0,
+      right: rec.right || 0,
+    });
+  }
+  return out;
+}
+function weakPoints(state, n) {
+  const map = {};
+  state.mistakes.forEach(function (m) {
+    if (m.mastered) return;
+    const key = m.kp || '其他';
+    if (!map[key]) map[key] = { kp: key, m: m.m, open: 0, total: 0 };
+    map[key].open += 1;
+    map[key].total += 1;
+  });
+  return Object.keys(map).map(function (k) { return map[k]; })
+    .sort(function (a, b) { return b.open - a.open; })
+    .slice(0, n || 5);
+}
 
 /* ---------- 答案判定 ---------- */
 function norm(s) {
@@ -2300,6 +2330,29 @@ function StatusView(props) {
         h(Stat, { k: '待复习', v: due, unit: '条' }),
         h(Stat, { k: '今日完成', v: (daily.questions || 0) + '/' + (state.settings.dailyQuestions || 12), unit: '题' }),
         h(Stat, { k: '今日正确率', v: daily.questions ? pct((daily.right || 0) / daily.questions) + '%' : '—', unit: '' }))),
+
+    h(Card, null,
+      h('h3', null, '近 7 天', h('span', { className: 'n' }, (function () {
+        const sum = last7Days(state).reduce(function (a, d) { return a + d.questions; }, 0);
+        return sum + ' 题';
+      })())),
+      last7Days(state).map(function (d) {
+        const rate = d.questions ? Math.round((d.right / d.questions) * 100) : 0;
+        return h('div', { key: d.key, className: 'mtc-row', style: { padding: '5px 0' } },
+          h('span', { className: 'mtc-small mtc-muted', style: { width: 46, flex: 'none' } }, d.label),
+          h('div', { className: 'grow' }, h(Bar, { value: d.questions ? rate : 0 })),
+          h('span', { className: 'mtc-small mtc-muted', style: { width: 92, textAlign: 'right', flex: 'none' } },
+            d.questions ? d.questions + ' 题 · ' + rate + '%' : '—'));
+      })),
+
+    h(Card, null,
+      h('h3', null, '薄弱知识点', h('span', { className: 'n' }, '按未掌握错题数')),
+      weakPoints(state, 5).length ? weakPoints(state, 5).map(function (w) {
+        return h('div', { key: w.kp, className: 'mtc-row' },
+          h('span', { className: 'mtc-small', style: { flex: 1, minWidth: 0 } }, w.kp),
+          h(Pill, null, MOD_MAP[w.m] ? MOD_MAP[w.m].short : ''),
+          h('span', { className: 'mtc-small mtc-muted', style: { width: 56, textAlign: 'right', flex: 'none' } }, w.open + ' 条'));
+      }) : h(Empty, null, '没有未掌握的错题，保持住。')),
 
     h(Card, null,
       h('h3', null, '各模块掌握度', h('span', { className: 'n' }, '近 20 题')),
