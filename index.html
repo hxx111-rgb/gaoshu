@@ -1150,6 +1150,29 @@ function addMistake(state, qid, cause, input) {
   };
   return Object.assign({}, state, { mistakes: state.mistakes.concat([item]) });
 }
+function addCustomMistake(state, payload) {
+  const id = 'X-' + Date.now();
+  const item = {
+    id: id, m: payload.m || state.currentModule, kp: payload.kp || '手动录入',
+    q: payload.q || '', cause: payload.cause || '未归类', sig: payload.sig || '',
+    s: payload.s || '', custom: true, wrong: 1, stage: 0,
+    nextReview: Date.now() + STAGES[0] * DAY, addedAt: Date.now(),
+    history: [{ at: Date.now(), result: 'new', input: '' }],
+  };
+  return Object.assign({}, state, { mistakes: state.mistakes.concat([item]) });
+}
+function questionOf(state, id) {
+  if (BANK_MAP[id]) return BANK_MAP[id];
+  const m = mistakeOf(state, id);
+  if (m && m.custom) {
+    return {
+      id: id, m: m.m, kp: m.kp || '手动录入', d: 0, t: '自评', q: m.q, a: [],
+      s: m.s || '（没填参考答案，按你手写的过程自评）',
+      sig: m.sig || '把这道题的识别信号写在错题本里，下次见同类直接套',
+    };
+  }
+  return null;
+}
 function dueMistakes(state, now) {
   const t = now || Date.now();
   return state.mistakes.filter(function (m) { return (m.nextReview || 0) <= t; });
@@ -1430,7 +1453,7 @@ function PracticeView(props) {
 
   const enabled = MODULES.filter(function (m) { return state.modules[m.id]; });
   const curId = queue ? queue[idx] : null;
-  const cur = curId ? BANK_MAP[curId] : null;
+  const cur = curId ? questionOf(state, curId) : null;
 
   function build() {
     let ids;
@@ -1448,7 +1471,7 @@ function PracticeView(props) {
       }).map(function (q) { return q.id; });
       ids = recent.concat(shuffled(pool, seed).slice(0, Math.max(0, cfg.n - recent.length)));
     } else if (mode === 'review') {
-      ids = dueMistakes(state).map(function (m) { return m.id; });
+      ids = preset && preset.only ? [preset.only] : dueMistakes(state).map(function (m) { return m.id; });
     } else {
       const pool = BANK.filter(function (q) {
         if (!state.modules[q.m]) return false;
@@ -1526,6 +1549,14 @@ function PracticeView(props) {
     setStage(2);
   }
 
+  function judgeCustom(ok) {
+    const q = cur;
+    if (!q) return;
+    set(reviewMistake(state, q.id, ok));
+    setResults(results.concat([{ id: q.id, ok: ok }]));
+    nextOne();
+  }
+
   if (!queue) {
     return h('div', null,
       h(Card, null,
@@ -1561,7 +1592,7 @@ function PracticeView(props) {
   if (idx >= queue.length) {
     const right = results.filter(function (r) { return r.ok; }).length;
     const total = results.length || 1;
-    const wrongQs = results.filter(function (r) { return !r.ok; }).map(function (r) { return BANK_MAP[r.id]; }).filter(Boolean);
+    const wrongQs = results.filter(function (r) { return !r.ok; }).map(function (r) { return questionOf(state, r.id); }).filter(Boolean);
     const worst = wrongQs[0];
     const conclusion = !wrongQs.length
       ? '全对，明天把难度升一档。'
@@ -1577,6 +1608,14 @@ function PracticeView(props) {
         h('div', { className: 'mtc-actions' },
           h(Btn, { tone: 'primary', onClick: function () { setQueue(null); setSeed(Date.now()); } }, daily ? '再来一次日测' : '再来一组'),
           h(Btn, { onClick: props.nav.bind(null, 'today') }, '回今日'))));
+  }
+
+  if (!cur) {
+    return h('div', null,
+      h(Card, null,
+        h('h3', null, '这道题已不在题库'),
+        h('div', { className: 'mtc-small mtc-muted' }, '可能已从错题本移出。'),
+        h('div', { className: 'mtc-actions' }, h(Btn, { tone: 'primary', onClick: nextOne }, '下一题'))));
   }
 
   return h('div', null,
@@ -1602,6 +1641,15 @@ function PracticeView(props) {
           h(Btn, { onClick: function () { setStage(4); } }, '看参考证明'),
           stage === 2 ? null : h(Btn, { tone: 'ok', onClick: function () { judgeProof(true); } }, '我证出来了'),
           stage === 2 ? null : h(Btn, { tone: 'hot', onClick: function () { judgeProof(false); } }, '没证出来')) : null) : null,
+
+      cur.t === '自评' ? h('div', null,
+        h('div', { className: 'mtc-small mtc-muted', style: { marginTop: 10 } }, '手动录入的错题按自评：先自己完整做一遍，再判断对错。'),
+        h('div', { className: 'mtc-actions' },
+          h(Btn, { tone: 'ok', onClick: function () { judgeCustom(true); } }, '做对了'),
+          h(Btn, { tone: 'hot', onClick: function () { judgeCustom(false); } }, '还是错')),
+        cur.s ? h('details', { style: { marginTop: 8 } },
+          h('summary', { className: 'mtc-small mtc-muted' }, '看参考答案'),
+          h('div', { className: 'mtc-small' }, h(MathText, { text: cur.s }))) : null) : null,
 
       (cur.t === '填空' || cur.t === '计算') ? h('div', { style: { marginTop: 10 } },
         h('input', {
@@ -1690,6 +1738,21 @@ function MistakesView(props) {
   const state = props.state;
   const list = state.mistakes.slice().sort(function (a, b) { return (a.nextReview || 0) - (b.nextReview || 0); });
   const due = dueMistakes(state).length;
+  const [open, setOpen] = useState(!!(props.preset && props.preset.add));
+  const [fq, setFq] = useState('');
+  const [fkp, setFkp] = useState('');
+  const [fg, setFg] = useState('');
+  const [fs, setFs] = useState('');
+  const [fm, setFm] = useState(state.currentModule || 'm1');
+  const [fc, setFc] = useState('思路选错');
+  const CAUSES = ['概念不清', '公式记错', '计算失误', '思路选错'];
+  function save() {
+    if (!fq.trim()) return;
+    props.set(function (s) {
+      return addCustomMistake(s, { m: fm, kp: fkp.trim() || '手动录入', q: fq.trim(), cause: fc, sig: fg.trim(), s: fs.trim() });
+    });
+    setFq(''); setFkp(''); setFg(''); setFs(''); setOpen(false);
+  }
   function fmtDate(ts) {
     const d = new Date(ts);
     return (d.getMonth() + 1) + '月' + d.getDate() + '日';
@@ -1699,7 +1762,46 @@ function MistakesView(props) {
       h('h3', null, '错题本', h('span', { className: 'n' }, '共 ' + list.length + ' 条 · 到期 ' + due + ' 条')),
       h('div', { className: 'mtc-actions' },
         h(Btn, { tone: 'primary', onClick: function () { props.nav('practice', { review: true }); }, disabled: !due }, '复习到期错题'),
-        h(Btn, { tone: 'ghost', onClick: function () { props.nav('practice'); } }, '去练习'))),
+        h(Btn, { tone: 'ghost', onClick: function () { props.nav('practice'); } }, '去练习'),
+        h(Btn, { tone: 'ghost', onClick: function () { setOpen(!open); } }, open ? '收起录入' : '+ 手录错题'))),
+
+    open ? h(Card, null,
+      h('h3', null, '手录一道错题', h('span', { className: 'n' }, '真题、视频题、书上题都能记')),
+      h('div', { className: 'mtc-toolbar' },
+        h('span', { className: 'mtc-small mtc-muted', style: { width: 56, flex: 'none' } }, '模块'),
+        h('select', {
+          className: 'mtc-input', value: fm, style: { width: 150 },
+          onChange: function (e) { setFm(e.target.value); },
+        }, MODULES.map(function (m) { return h('option', { key: m.id, value: m.id }, m.name); }))),
+      h('textarea', {
+        className: 'mtc-input', style: { width: '100%', minHeight: 74, marginTop: 8 }, value: fq,
+        placeholder: '题干：把题目抄成一行，如 ∫_0^1 x²dx = ?',
+        onChange: function (e) { setFq(e.target.value); },
+      }),
+      h('div', { className: 'mtc-toolbar', style: { marginTop: 8 } },
+        h('input', {
+          className: 'mtc-input', style: { flex: '1 1 120px' }, value: fkp,
+          placeholder: '考的是什么（如 分部积分）', onChange: function (e) { setFkp(e.target.value); },
+        })),
+      h('div', { className: 'mtc-toolbar', style: { marginTop: 8 } },
+        h('span', { className: 'mtc-small mtc-muted', style: { width: 56, flex: 'none' } }, '错因'),
+        CAUSES.map(function (c) {
+          return h(Btn, { key: c, on: fc === c, onClick: function () { setFc(c); } }, c);
+        })),
+      h('input', {
+        className: 'mtc-input', style: { width: '100%', marginTop: 8 }, value: fg,
+        placeholder: '识别信号：看到什么字眼就用这个方法（可先留空）',
+        onChange: function (e) { setFg(e.target.value); },
+      }),
+      h('textarea', {
+        className: 'mtc-input', style: { width: '100%', minHeight: 60, marginTop: 8 }, value: fs,
+        placeholder: '参考答案/关键一步（可选，重做时点开对照）',
+        onChange: function (e) { setFs(e.target.value); },
+      }),
+      h('div', { className: 'mtc-actions' },
+        h(Btn, { tone: 'primary', onClick: save, disabled: !fq.trim() }, '存进错题本 · 1/3/7/15 天复习'),
+        h(Btn, { tone: 'ghost', onClick: function () { setOpen(false); } }, '取消'))) : null,
+
     list.length ? list.map(function (m) {
       const q = BANK_MAP[m.id] || {};
       const overdue = (m.nextReview || 0) <= Date.now();
@@ -1711,9 +1813,9 @@ function MistakesView(props) {
         h('div', { className: 'mtc-q', style: { fontSize: 14 } }, h(MathText, { text: m.q })),
         h('div', { className: 'mtc-small', style: { marginTop: 8 } },
           h(Pill, { tone: 'warn' }, m.cause || '未归类'), ' ',
-          h('span', { className: 'mtc-muted' }, '识别信号：'), h(MathText, { text: q.sig || '' })),
+          h('span', { className: 'mtc-muted' }, '识别信号：'), h(MathText, { text: m.sig || q.sig || '' })),
         h('div', { className: 'mtc-actions' },
-          h(Btn, { onClick: function () { props.nav('practice', { review: true, only: m.id }); } }, '这道重做'),
+          h(Btn, { onClick: function () { props.nav('practice', { review: true, only: m.id, auto: true }); } }, '这道重做'),
           h(Btn, { tone: 'hot', onClick: function () { props.set(s => Object.assign({}, s, { mistakes: s.mistakes.filter(function (x) { return x.id !== m.id; }) })); } }, '移出错题本')));
     }) : h(Empty, null, '还没有错题。去练习，答错自动收录。'));
 }
@@ -2033,6 +2135,52 @@ function StatusView(props) {
         }),
         h('span', { className: 'mtc-small mtc-muted' }, '满分 150')),
       h('div', { className: 'mtc-toolbar' },
+        h('span', { className: 'mtc-small mtc-muted', style: { width: 76, flex: 'none' } }, '每日题量'),
+        h('input', {
+          className: 'mtc-input', style: { width: 76 }, type: 'number', value: state.settings.dailyQuestions || 12,
+          onChange: function (e) { updSet('dailyQuestions', Number(e.target.value) || 12); },
+        }),
+        h('span', { className: 'mtc-small mtc-muted', style: { marginLeft: 10 } }, '每日数学'),
+        h('input', {
+          className: 'mtc-input', style: { width: 76 }, type: 'number', value: state.settings.mathMinutes || 120,
+          onChange: function (e) { updSet('mathMinutes', Number(e.target.value) || 120); },
+        }),
+        h('span', { className: 'mtc-small mtc-muted' }, '分钟')),
+      h('div', { className: 'mtc-toolbar' },
+        h('span', { className: 'mtc-small mtc-muted', style: { width: 76, flex: 'none' } }, '备份'),
+        h(Btn, {
+          onClick: function () {
+            const blob = new window.Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+            const a = window.document.createElement('a');
+            a.href = window.URL.createObjectURL(blob);
+            a.download = 'math-coach-' + dayKey() + '.json';
+            window.document.body.appendChild(a);
+            a.click();
+            window.setTimeout(function () { window.URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+          },
+        }, '导出数据'),
+        h(Btn, { onClick: function () { const el = window.document.getElementById('mtc-import'); if (el) el.click(); } }, '导入备份'),
+        h('input', {
+          id: 'mtc-import', type: 'file', accept: '.json,application/json',
+          style: { display: 'none' },
+          onChange: function (e) {
+            const f = e.target.files && e.target.files[0];
+            if (!f) return;
+            const r = new window.FileReader();
+            r.onload = function () {
+              try {
+                const data = JSON.parse(String(r.result));
+                if (!data || !Array.isArray(data.mistakes)) throw new Error('bad');
+                window.localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign(defaultState(), data)));
+                window.location.reload();
+              } catch (err) {
+                window.alert('读不出来，确认是用「导出数据」生成的 JSON。');
+              }
+            };
+            r.readAsText(f);
+          },
+        })),
+      h('div', { className: 'mtc-toolbar' },
         h('span', { className: 'mtc-small mtc-muted', style: { width: 76, flex: 'none' } }, '证明题'),
         h(Btn, { on: !!state.settings.proof, onClick: function () { updSet('proof', !state.settings.proof); } },
           state.settings.proof ? '已开启（模考出证明题）' : '已关闭'),
@@ -2117,7 +2265,7 @@ function parseCommand(text, state) {
     return { tab: 'practice', preset: { review: true, auto: true }, msg: '复习到期错题（1/3/7/15 天曲线）。' };
   }
   if (cmd === '诊' || cmd === '诊断') {
-    return { tab: 'mistakes', msg: '错题本：看归因、识别信号、到期时间。' };
+    return { tab: 'mistakes', preset: { add: true }, msg: '错题本：手录这道错题 → 选错因 → 记识别信号 → 进 1/3/7/15 复习。' };
   }
   if (cmd === '公式') {
     return { tab: 'formulas', preset: { q: rest.join(' ') }, msg: rest.length ? '搜索公式：' + rest.join(' ') : '公式库全览。' };
@@ -2293,7 +2441,7 @@ function CoachPage() {
     mode: preset && preset.review ? 'review' : 'practice',
     key: preset ? JSON.stringify(preset) : 'default',
   }));
-  else if (tab === 'mistakes') body = h(MistakesView, common);
+  else if (tab === 'mistakes') body = h(MistakesView, Object.assign({}, common, { preset: preset }));
   else if (tab === 'formulas') body = h(FormulasView, Object.assign({}, common, { preset: preset }));
   else if (tab === 'cards') body = h(CardsView, Object.assign({}, common, { preset: preset }));
   else if (tab === 'plan') body = h(PlanView, common);
