@@ -848,6 +848,21 @@ function defaultModules() {
   const on = { m1: true, m2: true, m3: true, m4: true, m5: true, m6: true, m7: true, m8: true, m9: true };
   return on;
 }
+function seededMistakes() {
+  const seed = [
+    { id: 'L-03', cause: '概念不清', input: '1' },
+    { id: 'L-04', cause: '计算失误', input: '0' },
+  ];
+  return seed.map(function (x) {
+    const q = BANK_MAP[x.id];
+    if (!q) return null;
+    return {
+      id: x.id, m: q.m, kp: q.kp, q: q.q, cause: x.cause,
+      wrong: 1, stage: 0, nextReview: Date.now(), addedAt: Date.now() - DAY,
+      history: [{ at: Date.now() - DAY, result: 'new', input: x.input }],
+    };
+  }).filter(Boolean);
+}
 function defaultState() {
   return {
     v: 1,
@@ -858,7 +873,7 @@ function defaultState() {
     currentModule: 'm1',
     bank: {},
     attempts: [],
-    mistakes: [],
+    mistakes: seededMistakes(),
     dayStats: {},
     planSkips: [],
     createdAt: Date.now(),
