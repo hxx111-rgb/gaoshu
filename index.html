@@ -1176,6 +1176,27 @@ function shuffled(list, seed) {
 function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
 function pct(n) { return Math.round(clamp(n, 0, 1) * 100); }
 const WEEK = ['日', '一', '二', '三', '四', '五', '六'];
+function markLearned(state) {
+  const key = dayKey();
+  const rec = (state.dayStats && state.dayStats[key]) || { questions: 0, right: 0 };
+  if (rec.learned) return state;
+  const dayStats = Object.assign({}, state.dayStats);
+  dayStats[key] = Object.assign({}, rec, { learned: true });
+  return Object.assign({}, state, { dayStats: dayStats });
+}
+function streakDays(state) {
+  let n = 0;
+  for (let i = 0; i < 365; i += 1) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const rec = (state.dayStats && state.dayStats[dayKey(d)]) || null;
+    const hit = rec && ((rec.questions || 0) > 0 || rec.learned);
+    if (hit) n += 1;
+    else if (i > 0) break;
+    else break;
+  }
+  return n;
+}
 function last7Days(state) {
   const out = [];
   for (let i = 6; i >= 0; i -= 1) {
@@ -1912,6 +1933,23 @@ function TodayView(props) {
         due ? h(Btn, { onClick: function () { props.nav('mistakes'); } }, '先复习 ' + due + ' 条错题') : null,
         h(Btn, { tone: 'ghost', onClick: function () { props.nav('formulas'); } }, '背公式'))),
     h(Card, null,
+      h('h3', null, '今日任务', h('span', { className: 'n' }, '连续打卡 ' + streakDays(state) + ' 天')),
+      (function () {
+        const learned = !!(daily.learned);
+        const tasks = [
+          { k: '学', txt: '学「' + curM.short + '」：知识地图 + 必背公式', ok: learned, act: function () { props.nav('learn', { m: state.currentModule }); } },
+          { k: '练', txt: '做题 ' + doneQ + ' / ' + quota + ' 题', ok: doneQ >= quota, act: function () { props.nav('practice'); } },
+          { k: '复', txt: due ? '复习到期错题 ' + due + ' 条' : '今天没有到期错题', ok: due === 0, act: function () { props.nav('mistakes'); } },
+        ];
+        return tasks.map(function (t) {
+          return h('div', { key: t.k, className: 'mtc-row', style: { padding: '8px 0' } },
+            h('span', { className: 'mtc-small', style: { width: 22, flex: 'none', color: t.ok ? '#2f8a5b' : '#9aa7a1' } }, t.ok ? '✓' : '○'),
+            h('span', { className: 'mtc-small', style: { flex: 1, minWidth: 0 } }, t.txt),
+            h(Btn, { onClick: t.act }, t.ok ? '再看一眼' : '去完成'));
+        });
+      })()),
+
+    h(Card, null,
       h('h3', null, '本轮任务', h('span', { className: 'n' }, round ? round.start + ' → ' + round.end : '')),
       h('div', { className: 'mtc-small' }, round ? round.goal : '今天不在三轮计划区间，按自己的节奏推进。'),
       h('div', { className: 'mtc-small mtc-muted', style: { marginTop: 6 } }, '每日：' + (round ? round.daily : '视频 1 节 + 例题 3 道 + 错题复习 10 分钟'))),
@@ -2469,6 +2507,10 @@ function LearnView(props) {
     return pool.filter(function (q) { return q.d === d; })[0] || null;
   }).filter(Boolean);
   const done = function (q) { return !!(q && state.bank[q.id] && state.bank[q.id].seen); };
+
+  useEffect(function () {
+    props.set(markLearned);
+  }, [modId]);
 
   function start(i) {
     const q = ladder[i];
