@@ -730,6 +730,67 @@ BANK.push.apply(BANK, [
     s: '通解 C₁cos x + C₂sin x；代条件得 C₁=1，C₂=0', sig: '给了 y 和 y′ 的初值 → 分别代入定两个常数' },
 ]);
 
+/* ===== data-learn.js ===== */
+/* ---------- 学习页数据：每个模块一句话知识地图 + 生活化类比 ---------- */
+const LEARN = [
+  {
+    id: 'm1',
+    map: '极限先试直接代入；不行再等价无穷小、洛必达、泰勒展开。见到 1^∞ 立刻取对数，见到 ∞−∞ 先通分。',
+    analogy: '像给手机充电到 100%：永远差最后一点点，但我们完全可以说它「趋近满格」。',
+    watch: '0/0 与 ∞/∞ 是主战场；1^∞、∞−∞、0·∞ 是三个变形坑。',
+  },
+  {
+    id: 'm2',
+    map: '导数 = 瞬时变化率。先背熟 20 个基本导数，再套四则、复合、隐函数，最后用导数画函数：单调、极值、凹凸、渐近线。',
+    analogy: '开车时仪表盘上的速度：某一瞬间的速度就是导数，全程平均速度是平均变化率。',
+    watch: '复合函数别漏乘内层导数；极值要先看不可导点和端点。',
+  },
+  {
+    id: 'm3',
+    map: '积分是求导的逆运算，也是面积。三条路：凑微分换元、第二换元（根式）、分部积分；定积分再加华里士公式和对称性。',
+    analogy: '知道每一秒的速度表读数，倒推这段时间一共走了多远。',
+    watch: '不定积分别忘 +C；定积分换元后上下限必须跟着换。',
+  },
+  {
+    id: 'm4',
+    map: '把点、线、面都写成向量和方程：平面用点法式，直线用点向式；用点积判垂直、叉积判平行，再算距离和夹角。',
+    analogy: '快递地址三件套：门牌号（点）、走哪条路（方向向量）、墙朝哪边（法向量）。',
+    watch: '平面方程里法向量是系数 (A,B,C)，别和直线方向向量混。',
+  },
+  {
+    id: 'm5',
+    map: '偏导就是「对谁求导，别人当常数」。复合用链式法则，隐函数用公式法，极值先求驻点再验 AC−B²。',
+    analogy: '爬山时沿东西方向和南北方向各自量的坡度，就是两个偏导数。',
+    watch: 'AC−B² 的三种情形要背准：>0 有极值、<0 是鞍点、=0 失效。',
+  },
+  {
+    id: 'm6',
+    map: '二重积分三步：画区域 D → 选直角还是极坐标 → 定内外层上下限。区域对称先想奇偶性，能省一半计算。',
+    analogy: '给一块不规则的地秤重量：切成很多小方块，一块块加起来。',
+    watch: '极坐标别忘了多乘一个 r；交换次序前先重新画图。',
+  },
+  {
+    id: 'm7',
+    map: '弧长型看 ds，坐标型看 dx、dy；闭曲线优先格林公式，路径无关就找原函数，挖洞区域用「大减小」。',
+    analogy: '沿跑道走一圈：算踩过多少草地（第一类），算被风推着做了多少功（第二类）。',
+    watch: '格林公式要求正向（逆时针），挖洞时内圈是顺时针。',
+  },
+  {
+    id: 'm8',
+    map: '先判敛散：p 级数、等比、比值法、交错莱布尼茨；再求幂级数收敛半径；最后把五个麦克劳林展开式背到能用。',
+    analogy: '不停往箱子里放东西：每次放得越来越小，箱子可能装得下（收敛），也可能撑爆（发散）。',
+    watch: '收敛半径 R 的端点必须单独验；条件收敛与绝对收敛是两回事。',
+  },
+  {
+    id: 'm9',
+    map: '先认类型再套套路：可分离变量、一阶线性（积分因子）、可降阶、二阶常系数（三种特征根）。',
+    analogy: '知道加速度求位置：一步步积分回去，每积一次多一个常数 C。',
+    watch: '二阶非齐次先求齐次通解，再按右端形式设特解。',
+  },
+];
+const LEARN_MAP = {};
+LEARN.forEach(function (x) { LEARN_MAP[x.id] = x; });
+
 /* ===== data-formulas.js ===== */
 /* ---------- 公式库（陕西专升本考纲范围，全覆盖） ----------
    m: 模块  g: 分组  q: 公式名称  a: 公式  n: 条件/备注 */
@@ -1363,6 +1424,9 @@ const CSS = [
   '.mtc-empty{padding:30px 20px;text-align:center;color:var(--dsw-alias-label-secondary);border:1px dashed var(--dsw-alias-border-l2);border-radius:16px;background:var(--dsw-alias-bg-layer-1)}',
   '.mtc-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}',
   '.mtc-q{font-size:15px;line-height:2;padding:14px 16px;border-radius:14px;background:var(--dsw-alias-bg-layer-2);word-break:break-word}',
+  '.mtc-map{background:var(--dsw-alias-bg-layer-2);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.75;word-break:break-word}',
+  '.mtc-ladder{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--dsw-alias-border-l1);min-width:0}',
+  '.mtc-f{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:14.5px;line-height:1.9;word-break:break-word}',
   '.mtc-math{font-family:"Cambria Math","Georgia","Times New Roman",serif;letter-spacing:.2px}',
   '.mtc-q .mtc-math{font-size:16px}',
   '.mtc-feedback{margin-top:12px;padding:11px 13px;border-left:2px solid var(--dsw-alias-brand-primary);background:var(--mtc-accent-soft);border-radius:0 10px 10px 0;font-size:12.5px;line-height:1.8}',
@@ -1480,10 +1544,10 @@ function PracticeView(props) {
         if (q.t === '证明' && !state.settings.proof) return false;
         return true;
       });
-      ids = pool.map(function (q) { return q.id; });
+      ids = preset && preset.only ? [preset.only] : pool.map(function (q) { return q.id; });
     }
     if (!ids.length) return;
-    const list = preset && preset.daily
+    const list = (preset && (preset.daily || preset.only))
       ? ids
       : shuffled(ids, seed + cfg.m.length * 31 + cfg.d * 17).slice(0, mode === 'review' ? ids.length : cfg.n);
     setQueue(list);
@@ -1712,7 +1776,8 @@ function TodayView(props) {
         h(Stat, { k: '当前模块', v: mast.value == null ? '—' : mast.value + '%', unit: curM.short + (mast.value == null ? ' · 样本不足' : '') })),
       h(Bar, { value: quota ? (doneQ / quota) * 100 : 0 }),
       h('div', { className: 'mtc-actions' },
-        h(Btn, { tone: 'primary', onClick: function () { props.nav('practice'); } }, '开始今日练习'),
+        h(Btn, { tone: 'primary', onClick: function () { props.nav('learn', { m: state.currentModule }); } }, '今天学「' + curM.short + '」'),
+        h(Btn, { onClick: function () { props.nav('practice'); } }, '开始今日练习'),
         due ? h(Btn, { onClick: function () { props.nav('mistakes'); } }, '先复习 ' + due + ' 条错题') : null,
         h(Btn, { tone: 'ghost', onClick: function () { props.nav('formulas'); } }, '背公式'))),
     h(Card, null,
@@ -2207,6 +2272,68 @@ function StatusView(props) {
         }, '重置全部数据'))));
 }
 
+/* ===== app-learn.js ===== */
+/* ================= 学习页：知识地图 + 必背公式 + 3 道阶梯例题 ================= */
+function LearnView(props) {
+  const state = props.state;
+  const modId = (props.preset && props.preset.m) || state.currentModule || 'm1';
+  const mod = MOD_MAP[modId] || MODULES[0];
+  const info = LEARN_MAP[modId] || { map: '', analogy: '', watch: '' };
+  const fs = FORMULAS.filter(function (f) { return f.m === modId; });
+  const must = fs.slice(0, 6);
+  const pool = BANK.filter(function (q) {
+    return q.m === modId && q.t !== '证明' && state.modules[modId];
+  });
+  const ladder = [1, 2, 3].map(function (d) {
+    return pool.filter(function (q) { return q.d === d; })[0] || null;
+  }).filter(Boolean);
+  const done = function (q) { return !!(q && state.bank[q.id] && state.bank[q.id].seen); };
+
+  function start(i) {
+    const q = ladder[i];
+    if (!q) return;
+    props.nav('practice', { m: modId, d: q.d, n: 1, auto: true, only: q.id });
+  }
+
+  return h('div', null,
+    h(Card, null,
+      h('h3', null, mod.name, h('span', { className: 'n' }, '知识地图')),
+      h('div', { className: 'mtc-map' }, h(MathText, { text: info.map })),
+      h('div', { className: 'mtc-small mtc-muted', style: { marginTop: 8 } }, '打个比方：', info.analogy),
+      h('div', { className: 'mtc-small', style: { marginTop: 8 } }, h(Pill, { tone: 'warn' }, '注意'), h(MathText, { text: info.watch }))),
+
+    h(Card, null,
+      h('h3', null, '必背公式', h('span', { className: 'n' }, '★ 是这一层的核心')),
+      must.length ? must.map(function (f, i) {
+        return h('div', { key: f.q + i, className: 'mtc-row', style: { alignItems: 'flex-start' } },
+          h('span', { className: 'mtc-small', style: { width: 18, flex: 'none', color: i < 3 ? '#a9701a' : '#9aa7a1' } }, i < 3 ? '★' : '·'),
+          h('div', { className: 'grow' },
+            h('div', { className: 'mtc-small mtc-muted' }, f.q),
+            h('div', { className: 'mtc-f' }, h(MathText, { text: f.a }))));
+      }) : h(Empty, null, '这个模块还没有公式条目。'),
+      h('div', { className: 'mtc-actions' },
+        h(Btn, { onClick: function () { props.nav('formulas', { m: modId }); } }, '看全部 ' + fs.length + ' 条'),
+        h(Btn, { tone: 'ghost', onClick: function () { props.nav('cards', { m: modId }); } }, '拿这模块抽卡片'))),
+
+    h(Card, null,
+      h('h3', null, '阶梯例题', h('span', { className: 'n' }, '做完一道解锁下一道')),
+      ladder.length ? ladder.map(function (q, i) {
+        const unlocked = i === 0 || done(ladder[i - 1]);
+        const finished = done(q);
+        return h('div', { key: q.id, className: 'mtc-ladder' },
+          h('div', { className: 'grow' },
+            h('div', { className: 'mtc-small' },
+              h(Pill, { tone: finished ? 'ok' : null }, '第 ' + (i + 1) + ' 题 · ' + (q.d === 1 ? '基础' : q.d === 2 ? '中档' : '中高')),
+              ' ',
+              h('span', { className: 'mtc-muted' }, q.kp)),
+            h('div', { className: 'mtc-f', style: { marginTop: 4 } }, h(MathText, { text: q.q }))),
+          unlocked
+            ? h(Btn, { tone: finished ? 'ghost' : 'primary', onClick: function () { start(i); } }, finished ? '再做一次' : '开始')
+            : h('span', { className: 'mtc-small mtc-muted', style: { flex: 'none' } }, '未解锁'));
+      }) : h(Empty, null, '这个模块题库还不够，先去练习页。')),
+  );
+}
+
 /* ===== app-command.js ===== */
 /* ---------- 命令栏：/练 /学 /复习 /公式 /卡片 /日测 /模考 /规划 /状态 ---------- */
 const CMD_HELP = [
@@ -2256,9 +2383,9 @@ function parseCommand(text, state) {
   if (cmd === '学') {
     const m = mod || state.currentModule;
     return {
-      tab: 'practice',
-      preset: { m: m, d: 1, n: 3, auto: true },
-      msg: '入门：' + MOD_MAP[m].name + ' · 基础 3 题，一题一停。',
+      tab: 'learn',
+      preset: { m: m },
+      msg: '学习页：' + MOD_MAP[m].name + ' 的知识地图、必背公式、3 道阶梯例题。',
     };
   }
   if (cmd === '复习' || cmd === '错' || cmd === '错题') {
@@ -2343,6 +2470,7 @@ const DICT = {
 const TABS = [
   { k: 'today', label: '今日' },
   { k: 'practice', label: '练习' },
+  { k: 'learn', label: '学' },
   { k: 'mistakes', label: '错题' },
   { k: 'formulas', label: '公式' },
   { k: 'cards', label: '卡片' },
@@ -2442,6 +2570,7 @@ function CoachPage() {
     key: preset ? JSON.stringify(preset) : 'default',
   }));
   else if (tab === 'mistakes') body = h(MistakesView, Object.assign({}, common, { preset: preset }));
+  else if (tab === 'learn') body = h(LearnView, Object.assign({}, common, { preset: preset }));
   else if (tab === 'formulas') body = h(FormulasView, Object.assign({}, common, { preset: preset }));
   else if (tab === 'cards') body = h(CardsView, Object.assign({}, common, { preset: preset }));
   else if (tab === 'plan') body = h(PlanView, common);
