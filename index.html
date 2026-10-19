@@ -1443,6 +1443,15 @@ function roundOf(dateStr) {
   }
   return null;
 }
+function planSoon(dateStr) {
+  const t = parseDate(dateStr || dayKey());
+  if (!t) return null;
+  const ts = t.getTime();
+  for (let i = 0; i < PLAN.length; i += 1) {
+    if (ts < parseDate(PLAN[i].start).getTime()) return PLAN[i];
+  }
+  return null;
+}
 function planProgress(state) {
   const done = state.attempts.length;
   const started = parseDate(PLAN[0].start);
@@ -1913,6 +1922,7 @@ function TodayView(props) {
   const due = dueMistakes(state).length;
   const left = daysUntil(state.examDate);
   const round = roundOf(today);
+  const soon = round ? null : planSoon(today);
   const curM = MOD_MAP[state.currentModule] || MODULES[0];
   const mast = masteryOf(state, state.currentModule);
   const quota = state.settings.dailyQuestions || 12;
@@ -1920,7 +1930,7 @@ function TodayView(props) {
 
   return h('div', null,
     h(Card, null,
-      h('h3', null, '今天', h('span', { className: 'n' }, round ? round.name : '不在三轮区间')),
+      h('h3', null, '今天', h('span', { className: 'n' }, round ? round.name : soon ? soon.name + ' · ' + soon.start + ' 开始' : '不在三轮区间')),
       h('div', { className: 'mtc-grid' },
         h(Stat, { k: '距考试', v: left == null ? '—' : left, unit: '天' }),
         h(Stat, { k: '今日完成', v: doneQ + '/' + quota, unit: '题' }),
@@ -1949,9 +1959,14 @@ function TodayView(props) {
         });
       })()),
 
+    state.attempts.length === 0 ? h(Card, null,
+      h('h3', null, '先摸底', h('span', { className: 'n' }, '约 10 分钟')),
+      h('div', { className: 'mtc-small' }, '还没做过题。先做函数极限 4 道基础题，我按正确率决定从补基础还是中档开始。'),
+      h('div', { className: 'mtc-actions' },
+        h(Btn, { tone: 'primary', onClick: function () { props.nav('practice', { m: 'm1', d: 1, n: 4, auto: true }); } }, '开始摸底（4 题）'))) : null,
     h(Card, null,
       h('h3', null, '本轮任务', h('span', { className: 'n' }, round ? round.start + ' → ' + round.end : '')),
-      h('div', { className: 'mtc-small' }, round ? round.goal : '今天不在三轮计划区间，按自己的节奏推进。'),
+      h('div', { className: 'mtc-small' }, round ? round.goal : soon ? soon.goal + '（' + soon.start + ' 开始，还有 ' + Math.max(0, Math.round((parseDate(soon.start).getTime() - parseDate(today).getTime()) / 86400000)) + ' 天）' : '今天不在三轮计划区间，按自己的节奏推进。'),
       h('div', { className: 'mtc-small mtc-muted', style: { marginTop: 6 } }, '每日：' + (round ? round.daily : '视频 1 节 + 例题 3 道 + 错题复习 10 分钟'))),
     h(Card, null,
       h('h3', null, '模块进度'),
