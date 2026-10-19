@@ -2134,7 +2134,8 @@ function MistakesView(props) {
       h('div', { className: 'mtc-actions' },
         h(Btn, { tone: 'primary', onClick: function () { props.nav('practice', { review: true }); }, disabled: !due }, '复习到期错题'),
         h(Btn, { tone: 'ghost', onClick: function () { props.nav('practice'); } }, '去练习'),
-        h(Btn, { tone: 'ghost', onClick: function () { setOpen(!open); } }, open ? '收起录入' : '+ 手录错题'))),
+        h(Btn, { tone: 'ghost', onClick: function () { setOpen(!open); } }, open ? '收起录入' : '+ 手录错题')),
+      h('div', { className: 'mtc-small mtc-muted', style: { marginTop: 10 } }, '复习阶梯：答对进一阶（1 → 3 → 7 → 15 天），答错回到第 1 阶，连对四次算掌握。')),
 
     open ? h(Card, null,
       h('h3', null, '手录一道错题', h('span', { className: 'n' }, '真题、视频题、书上题都能记')),
@@ -2180,7 +2181,7 @@ function MistakesView(props) {
         h('h3', null,
           h(Pill, { tone: overdue ? 'hot' : null }, overdue ? '到期' : '下次 ' + fmtDate(m.nextReview)),
           h(Pill, null, MOD_MAP[m.m] ? MOD_MAP[m.m].short : ''),
-          h('span', { className: 'n' }, '第 ' + (m.stage || 0) + '/4 阶段 · 错 ' + (m.wrong || 1) + ' 次')),
+          h('span', { className: 'n' }, (m.stage >= 4 ? '已掌握 · ' : '第 ' + (m.stage || 0) + '/4 阶 · ') + '错 ' + (m.wrong || 1) + ' 次')),
         h('div', { className: 'mtc-q', style: { fontSize: 14 } }, h(MathText, { text: m.q })),
         h('div', { className: 'mtc-small', style: { marginTop: 8 } },
           h(Pill, { tone: 'warn' }, m.cause || '未归类'), ' ',
