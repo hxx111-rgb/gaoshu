@@ -1104,6 +1104,13 @@ const CSS = [
   '.mtc-tab{appearance:none;border:0;border-radius:10px;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:12.5px;flex:1 1 0;min-width:0;padding:8px 2px;cursor:pointer;white-space:nowrap;text-align:center}',
   '.mtc-tab:hover{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary)}',
   '.mtc-tab[data-active="true"]{background:var(--mtc-accent-soft);color:var(--dsw-alias-brand-primary);font-weight:600}',
+  '.mtc-cmd{background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:14px;padding:10px 12px;margin:-10px 0 18px;box-shadow:var(--mtc-shadow)}',
+  '.mtc-cmd-row{display:flex;align-items:center;gap:8px}',
+  '.mtc-cmd-prefix{color:var(--dsw-alias-brand-primary);font-weight:700;font-size:15px}',
+  '.mtc-cmd-input{flex:1 1 auto;min-width:0}',
+  '.mtc-cmd-help{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}',
+  '.mtc-cmd-chip{appearance:none;border:1px dashed var(--dsw-alias-border-l2);background:transparent;border-radius:999px;color:var(--dsw-alias-label-secondary);font:inherit;font-size:11.5px;padding:4px 9px;cursor:pointer}',
+  '.mtc-cmd-chip:hover{border-style:solid;color:var(--dsw-alias-brand-primary)}',
   '.mtc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}',
   '.mtc-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}',
   '.mtc-card{background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:var(--mtc-shadow)}',
@@ -1201,7 +1208,7 @@ function PracticeView(props) {
   const [cfg, setCfg] = useState(function () {
     return {
       m: preset && preset.m ? preset.m : state.currentModule,
-      d: 0,
+      d: preset && preset.d ? preset.d : 0,
       n: preset && preset.n ? preset.n : (state.settings.dailyQuestions || 8),
     };
   });
@@ -1213,6 +1220,10 @@ function PracticeView(props) {
   const [results, setResults] = useState([]);
   const [seed, setSeed] = useState(function () { return Date.now(); });
   const [cause, setCause] = useState('');
+
+  useEffect(function () {
+    if (preset && preset.auto) build();
+  }, []);
 
   const enabled = MODULES.filter(function (m) { return state.modules[m.id]; });
   const curId = queue ? queue[idx] : null;
@@ -1485,7 +1496,7 @@ function MistakesView(props) {
 /* ================= 公式库 ================= */
 function FormulasView(props) {
   const state = props.state;
-  const [kw, setKw] = useState('');
+  const [kw, setKw] = useState(props.preset && props.preset.q ? props.preset.q : '');
   const [m, setM] = useState('all');
   const [group, setGroup] = useState('all');
   const list = FORMULAS.filter(function (f) {
@@ -1538,7 +1549,7 @@ function FormulasView(props) {
 /* ================= 公式卡片 ================= */
 function CardsView(props) {
   const state = props.state;
-  const [m, setM] = useState('all');
+  const [m, setM] = useState(props.preset && props.preset.m ? props.preset.m : 'all');
   const [i, setI] = useState(0);
   const [flip, setFlip] = useState(false);
   const [seed, setSeed] = useState(function () { return Date.now(); });
@@ -1823,6 +1834,120 @@ function StatusView(props) {
         }, '重置全部数据'))));
 }
 
+/* ===== app-command.js ===== */
+/* ---------- 命令栏：/练 /学 /复习 /公式 /卡片 /日测 /模考 /规划 /状态 ---------- */
+const CMD_HELP = [
+  ['/练 极限 中档 5', '按模块·难度·题数练习'],
+  ['/学 积分', '基础 3 题入手'],
+  ['/复习', '到期错题'],
+  ['/公式 极坐标', '搜公式库'],
+  ['/卡片 级数', '背公式卡片'],
+  ['/日测', '5 题，限时 15 分钟'],
+  ['/模考', '150 分钟套卷'],
+  ['/规划', '三轮计划与落后重排'],
+  ['/状态', '掌握度·错题·距考'],
+  ['/诊', '错题本与归因'],
+];
+
+const DIFF_WORDS = { '基础': 1, '简单': 1, '中档': 2, '中等': 2, '中高': 3, '难': 3, '全部': 0, '不限': 0 };
+
+function pickModuleId(tokens) {
+  for (let i = 0; i < tokens.length; i += 1) {
+    const t = tokens[i];
+    const hit = MODULES.filter(function (m) {
+      return m.id === t || m.short === t || m.name.indexOf(t) >= 0;
+    })[0];
+    if (hit) return hit.id;
+  }
+  return null;
+}
+
+function parseCommand(text, state) {
+  const raw = String(text || '').trim();
+  if (!raw) return { msg: '输入一个命令，例如 /练 极限 中档 5。' };
+  const parts = raw.replace(/^\//, '').split(/[\s，,、]+/).filter(Boolean);
+  const cmd = parts[0] || '';
+  const rest = parts.slice(1);
+  const diff = rest.map(function (t) { return DIFF_WORDS[t]; }).filter(function (x) { return x != null; })[0];
+  const num = rest.map(function (t) { return /^\d+$/.test(t) ? parseInt(t, 10) : null; }).filter(function (x) { return x != null; })[0];
+  const mod = pickModuleId(rest);
+
+  if (cmd === '练' || cmd === '练习') {
+    const n = num || state.settings.dailyQuestions || 8;
+    return {
+      tab: 'practice',
+      preset: { m: mod || 'all', d: diff || 0, n: n, auto: true },
+      msg: '练习：' + (mod ? MOD_MAP[mod].name : '全部模块') + ' · ' + (diff ? (diff === 1 ? '基础' : diff === 2 ? '中档' : '中高') : '不限难度') + ' · ' + n + ' 题',
+    };
+  }
+  if (cmd === '学') {
+    const m = mod || state.currentModule;
+    return {
+      tab: 'practice',
+      preset: { m: m, d: 1, n: 3, auto: true },
+      msg: '入门：' + MOD_MAP[m].name + ' · 基础 3 题，一题一停。',
+    };
+  }
+  if (cmd === '复习' || cmd === '错' || cmd === '错题') {
+    return { tab: 'practice', preset: { review: true, auto: true }, msg: '复习到期错题（1/3/7/15 天曲线）。' };
+  }
+  if (cmd === '诊' || cmd === '诊断') {
+    return { tab: 'mistakes', msg: '错题本：看归因、识别信号、到期时间。' };
+  }
+  if (cmd === '公式') {
+    return { tab: 'formulas', preset: { q: rest.join(' ') }, msg: rest.length ? '搜索公式：' + rest.join(' ') : '公式库全览。' };
+  }
+  if (cmd === '卡片' || cmd === '背') {
+    return { tab: 'cards', preset: { m: mod || 'all' }, msg: '卡片：' + (mod ? MOD_MAP[mod].name : '全部模块') + '。' };
+  }
+  if (cmd === '日测' || cmd === '测') {
+    return { tab: 'practice', preset: { m: 'all', d: 0, n: 5, auto: true }, msg: '日测 5 题，限时 15 分钟，做完看正确率。' };
+  }
+  if (cmd === '模考' || cmd === '考试') {
+    return { tab: 'exam', msg: '模考：填空 25 + 选择 25 + 计算 80 + 证明 20，150 分钟。' };
+  }
+  if (cmd === '规划' || cmd === '计划') {
+    return { tab: 'plan', msg: '三轮计划与落后重排。' };
+  }
+  if (cmd === '状态' || cmd === 'setup' || cmd === '配置') {
+    return { tab: 'status', msg: '状态：掌握度、错题、距考天数、模块开关。' };
+  }
+  if (cmd === '重置') {
+    return { tab: 'status', msg: '重置在「状态」页底部，需要点两次确认才清空。' };
+  }
+  if (cmd === '帮助' || cmd === 'help' || cmd === '?') {
+    return { msg: '命令：' + CMD_HELP.map(function (x) { return x[0]; }).join('  ') };
+  }
+  return { msg: '不认识的命令「' + cmd + '」。可用：/练 /学 /复习 /公式 /卡片 /日测 /模考 /规划 /状态 /诊' };
+}
+
+function CommandBar(props) {
+  const [text, setText] = useState('');
+  function run() {
+    const res = parseCommand(text, props.state);
+    if (res) props.onRun(res);
+    setText('');
+  }
+  return h('div', { className: 'mtc-cmd' },
+    h('div', { className: 'mtc-cmd-row' },
+      h('span', { className: 'mtc-cmd-prefix' }, '/'),
+      h('input', {
+        className: 'mtc-input mtc-cmd-input', value: text, autoFocus: true,
+        placeholder: '练 极限 中档 5',
+        onChange: function (e) { setText(e.target.value); },
+        onKeyDown: function (e) { if (e.key === 'Enter') run(); if (e.key === 'Escape') props.onClose(); },
+      }),
+      h(Btn, { tone: 'primary', onClick: run }, '执行'),
+      h(Btn, { tone: 'ghost', onClick: props.onClose }, '关闭')),
+    props.msg ? h('div', { className: 'mtc-small mtc-muted', style: { marginTop: 6 } }, props.msg) : null,
+    h('div', { className: 'mtc-cmd-help' }, CMD_HELP.map(function (x) {
+      return h('button', {
+        key: x[0], type: 'button', className: 'mtc-cmd-chip', title: x[1],
+        onClick: function () { setText(x[0].replace(/^\//, '')); },
+      }, x[0]);
+    })));
+}
+
 /* ===== app-shell.js ===== */
 /* ---------- 页面壳 ---------- */
 const DICT = {
@@ -1896,6 +2021,12 @@ function CoachPage() {
   const presetState = useState(null);
   const preset = presetState[0];
   const setPreset = presetState[1];
+  const cmdState = useState(false);
+  const cmdOpen = cmdState[0];
+  const setCmdOpen = cmdState[1];
+  const cmdMsgState = useState('');
+  const cmdMsg = cmdMsgState[0];
+  const setCmdMsg = cmdMsgState[1];
   const rootRef = React.useRef(null);
 
   useStyleOnce();
@@ -1911,14 +2042,20 @@ function CoachPage() {
     setTab(next || 'today');
   }
 
+  function runCommand(res) {
+    if (!res) return;
+    if (res.tab) nav(res.tab, res.preset || null);
+    setCmdMsg(res.msg || '');
+  }
+
   const common = { state: state, set: setState, nav: nav };
 
   let body = null;
   if (tab === 'today') body = h(TodayView, common);
   else if (tab === 'practice') body = h(PracticeView, Object.assign({}, common, { preset: preset, key: preset && preset.review ? 'review' : 'practice' }));
   else if (tab === 'mistakes') body = h(MistakesView, common);
-  else if (tab === 'formulas') body = h(FormulasView, common);
-  else if (tab === 'cards') body = h(CardsView, common);
+  else if (tab === 'formulas') body = h(FormulasView, Object.assign({}, common, { preset: preset }));
+  else if (tab === 'cards') body = h(CardsView, Object.assign({}, common, { preset: preset }));
   else if (tab === 'plan') body = h(PlanView, common);
   else if (tab === 'exam') body = h(ExamView, common);
   else body = h(StatusView, common);
@@ -1933,6 +2070,10 @@ function CoachPage() {
         h('div', { className: 'mtc-spacer' }),
         h('div', { className: 'mtc-count' }, h('b', null, left == null ? '—' : left), ' 天'),
         h('button', {
+          type: 'button', className: 'mtc-theme-btn', title: '命令（/练 /学 /公式 …）',
+          onClick: function () { setCmdOpen(!cmdOpen); },
+        }, '⌘'),
+        h('button', {
           type: 'button', className: 'mtc-theme-btn', title: '切换深浅色',
           onClick: function () {
             setState(function (s) {
@@ -1946,6 +2087,10 @@ function CoachPage() {
           onClick: function () { nav(x.k); },
         }, x.label);
       })),
+      cmdOpen ? h(CommandBar, {
+        state: state, msg: cmdMsg, onRun: runCommand,
+        onClose: function () { setCmdOpen(false); },
+      }) : null,
       body));
 }
 
